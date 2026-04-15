@@ -1,63 +1,73 @@
-// components/ui/toggle-group.tsx
+'use client'
 
-import * as React from "react"
-import { cn } from "@/lib/utils"
+import * as React from 'react'
+import * as ToggleGroupPrimitive from '@radix-ui/react-toggle-group'
+import { type VariantProps } from 'class-variance-authority'
 
-const ToggleGroupContext = React.createContext<{
-  value: string
-  onChange: (value: string) => void
-  type: "single" | "multiple"
-} | null>(null)
+import { cn } from '@/lib/utils'
+import { toggleVariants } from '@/components/ui/toggle'
 
-const ToggleGroup = ({
-  children,
-  value,
-  onValueChange,
-  type = "single",
+const ToggleGroupContext = React.createContext<
+  VariantProps<typeof toggleVariants>
+>({
+  size: 'default',
+  variant: 'default',
+})
+
+function ToggleGroup({
   className,
-}: {
-  children: React.ReactNode
-  value: string
-  onValueChange: (value: string) => void
-  type?: "single" | "multiple"
-  className?: string
-}) => {
+  variant,
+  size,
+  children,
+  ...props
+}: React.ComponentProps<typeof ToggleGroupPrimitive.Root> &
+  VariantProps<typeof toggleVariants>) {
   return (
-    <ToggleGroupContext.Provider
-      value={{ value, onChange: onValueChange, type }}
+    <ToggleGroupPrimitive.Root
+      data-slot="toggle-group"
+      data-variant={variant}
+      data-size={size}
+      className={cn(
+        'group/toggle-group flex w-fit items-center rounded-md data-[variant=outline]:shadow-xs',
+        className,
+      )}
+      {...props}
     >
-      <div className={cn("flex gap-2", className)}>{children}</div>
-    </ToggleGroupContext.Provider>
+      <ToggleGroupContext.Provider value={{ variant, size }}>
+        {children}
+      </ToggleGroupContext.Provider>
+    </ToggleGroupPrimitive.Root>
   )
 }
 
-const ToggleGroupItem = React.forwardRef<
-  HTMLButtonElement,
-  React.ButtonHTMLAttributes<HTMLButtonElement> & {
-    value: string
-  }
->(({ value, className, ...props }, ref) => {
+function ToggleGroupItem({
+  className,
+  children,
+  variant,
+  size,
+  ...props
+}: React.ComponentProps<typeof ToggleGroupPrimitive.Item> &
+  VariantProps<typeof toggleVariants>) {
   const context = React.useContext(ToggleGroupContext)
-  if (!context) throw new Error("ToggleGroupItem must be inside ToggleGroup")
-
-  const isSelected = context.value === value
 
   return (
-    <button
-      ref={ref}
-      onClick={() => context.onChange(value)}
+    <ToggleGroupPrimitive.Item
+      data-slot="toggle-group-item"
+      data-variant={context.variant || variant}
+      data-size={context.size || size}
       className={cn(
-        "inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-        isSelected && "bg-accent text-accent-foreground",
-        className
+        toggleVariants({
+          variant: context.variant || variant,
+          size: context.size || size,
+        }),
+        'min-w-0 flex-1 shrink-0 rounded-none shadow-none first:rounded-l-md last:rounded-r-md focus:z-10 focus-visible:z-10 data-[variant=outline]:border-l-0 data-[variant=outline]:first:border-l',
+        className,
       )}
-      data-state={isSelected ? "on" : "off"}
       {...props}
     >
-      {props.children}
-    </button>
+      {children}
+    </ToggleGroupPrimitive.Item>
   )
-})
-ToggleGroupItem.displayName = "ToggleGroupItem"
+}
 
 export { ToggleGroup, ToggleGroupItem }

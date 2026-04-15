@@ -1,58 +1,45 @@
-// components/ui/radio-group.tsx
+'use client'
 
-import * as React from "react"
-import { Circle } from "lucide-react"
-import { cn } from "@/lib/utils"
+import * as React from 'react'
+import * as RadioGroupPrimitive from '@radix-ui/react-radio-group'
+import { CircleIcon } from 'lucide-react'
 
-const RadioGroupContext = React.createContext<{
-  value: string
-  onChange: (value: string) => void
-} | null>(null)
+import { cn } from '@/lib/utils'
 
-const RadioGroup = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & {
-    value: string
-    onValueChange: (value: string) => void
-  }
->(({ className, value, onValueChange, ...props }, ref) => (
-  <RadioGroupContext.Provider value={{ value, onChange: onValueChange }}>
-    <div
-      ref={ref}
-      className={cn("flex items-center gap-4", className)}
+function RadioGroup({
+  className,
+  ...props
+}: React.ComponentProps<typeof RadioGroupPrimitive.Root>) {
+  return (
+    <RadioGroupPrimitive.Root
+      data-slot="radio-group"
+      className={cn('grid gap-3', className)}
       {...props}
     />
-  </RadioGroupContext.Provider>
-))
-RadioGroup.displayName = "RadioGroup"
-
-const RadioGroupItem = React.forwardRef<
-  HTMLInputElement,
-  React.InputHTMLAttributes<HTMLInputElement> & {
-    value: string
-  }
->(({ className, value, ...props }, ref) => {
-  const context = React.useContext(RadioGroupContext)
-  if (!context) throw new Error("RadioGroupItem must be used inside RadioGroup")
-
-  return (
-    <div className="relative flex items-center">
-      <input
-        type="radio"
-        ref={ref}
-        value={value}
-        checked={context.value === value}
-        onChange={(e) => context.onChange(e.target.value)}
-        className={cn(
-          "peer h-4 w-4 shrink-0 rounded-full border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer appearance-none bg-background checked:border-primary",
-          className
-        )}
-        {...props}
-      />
-      <Circle className="pointer-events-none absolute left-1 top-1 h-2 w-2 fill-primary text-primary opacity-0 peer-checked:opacity-100" />
-    </div>
   )
-})
-RadioGroupItem.displayName = "RadioGroupItem"
+}
+
+function RadioGroupItem({
+  className,
+  ...props
+}: React.ComponentProps<typeof RadioGroupPrimitive.Item>) {
+  return (
+    <RadioGroupPrimitive.Item
+      data-slot="radio-group-item"
+      className={cn(
+        'border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 dark:bg-input/30 aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50',
+        className,
+      )}
+      {...props}
+    >
+      <RadioGroupPrimitive.Indicator
+        data-slot="radio-group-indicator"
+        className="relative flex items-center justify-center"
+      >
+        <CircleIcon className="fill-primary absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2" />
+      </RadioGroupPrimitive.Indicator>
+    </RadioGroupPrimitive.Item>
+  )
+}
 
 export { RadioGroup, RadioGroupItem }
