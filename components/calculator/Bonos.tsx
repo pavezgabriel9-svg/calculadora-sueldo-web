@@ -70,7 +70,7 @@ export function Bonos({
             <Checkbox
               id="imponible"
               checked={imponible}
-              onCheckedChange={(c) => setImponible(c === true)}
+              onChange={(e) => setImponible(e.target.checked)}
             />
             <Label htmlFor="imponible" className="text-sm cursor-pointer">
               Imponible
