@@ -1,7 +1,7 @@
 # Frontend Migration Design: Calculadora de Sueldos Web
 **Date:** 2026-04-14  
-**Status:** Design Approved  
-**Version:** 1.0
+**Status:** Fase 1 Completada — Fase 2 En Preparación  
+**Version:** 1.1
 
 ---
 
@@ -9,8 +9,8 @@
 
 Upgrade de **calculadora_sueldo** (proyecto desktop Python) a **calculadora-sueldo-web** (web MVP en Vercel). Se migrará el diseño profesional de `b_fc7tatT10DT/` manteniendo arquitectura limpia, modular y preparada para integración con BD en Fase 2.
 
-**Fase 1 (actual):** Diseño + estructura preparada, valores hardcodeados.  
-**Fase 2 (futura):** Integración con BD (Supabase o túnel SSH) con fallback.
+**Fase 1 (completada 2026-04-15):** Diseño + estructura preparada, valores hardcodeados. Desplegado en Vercel bajo cuenta `pavezgabriel9-svg`.  
+**Fase 2 (actual):** Integración con BD (Supabase o túnel SSH) con fallback.
 
 ---
 
@@ -67,7 +67,7 @@ Upgrade de **calculadora_sueldo** (proyecto desktop Python) a **calculadora-suel
 - **Runtime:** Next.js 16.1.6 + React 19.2.3
 - **Lenguaje:** TypeScript 5
 - **Estilos:** Tailwind CSS v4 + PostCSS v4
-- **Componentes:** shadcn/ui basics (DIY, no Radix UI en Fase 1)
+- **Componentes:** shadcn/ui con Radix UI primitives (@radix-ui/react-select, toggle-group, toggle, radio-group, checkbox, label, separator, slot)
 - **Fonts:** Geist (Google Fonts)
 - **Analytics:** Vercel Analytics (prod only)
 - **Dark Mode:** localStorage + CSS class
@@ -281,8 +281,12 @@ npm install --save-dev @tailwindcss/postcss@4 tailwindcss@4 typescript@5 \
   @types/node@20 @types/react@19 @types/react-dom@19 postcss@8.5
 ```
 
-**NO incluidos en Fase 1:**
-- ❌ `@radix-ui/*` (usaremos componentes shadcn DIY con Tailwind)
+**Agregados en corrección Fase 1 (2026-04-15):**
+- ✅ `@radix-ui/react-select`, `react-toggle-group`, `react-toggle`, `react-radio-group`, `react-checkbox`, `react-label`, `react-separator`, `react-slot`
+- ✅ `postcss.config.mjs` corregido con `@tailwindcss/postcss` (sin esto Tailwind no compilaba)
+- ✅ `tsconfig.json` excluye `b_fc7tatT10DT/` del compilador
+
+**No incluidos:**
 - ❌ `react-hook-form`, `zod` (validación simple por ahora)
 - ❌ `next-themes` (localStorage es suficiente)
 - ❌ `recharts` (gráficos, si aplica en futuro)
@@ -343,7 +347,7 @@ NEXT_PUBLIC_SITE_URL=https://calculadora-sueldo-web.vercel.app
 - ✅ Sistema salud (Fonasa vs Isapre con UF)
 - ✅ Dark mode (toggle, persistencia localStorage)
 - ✅ Responsividad (desktop, tablet, mobile)
-- ✅ Vercel deploy (build, load time)
+- ✅ Vercel deploy exitoso (2026-04-15) bajo `pavezgabriel9-svg`
 
 **No requerido Fase 1:**
 - ❌ Tests unitarios (jest/vitest)
@@ -410,6 +414,56 @@ npm run dev
 
 ---
 
-**Documento aprobado por:** [Usuario]  
-**Fecha aprobación:** [TBD]  
-**Version:** 1.0
+**Documento aprobado por:** Gabriel Pavez  
+**Fecha aprobación:** 2026-04-14  
+**Fase 1 completada:** 2026-04-15  
+**Version:** 1.1
+
+---
+
+## Fase 2: Integración BD — Plan Ajustado
+
+### Objetivo
+Reemplazar valores hardcodeados por datos dinámicos desde Supabase, con fallback robusto y evaluación de staleness.
+
+### Estrategia
+Supabase (server-side). Tabla `country_config` con estructura:
+
+```
+pais
+afp_data, afp_updated_at
+uf_value, uf_updated_at
+tasas, tasas_updated_at
+updated_at
+```
+
+### Arquitectura de Código
+
+```
+lib/
+├── config.ts                → fallback hardcoded (sin cambios)
+├── supabase.ts              → cliente server-side (nuevo)
+└── services/
+    └── configService.ts    → fetch + staleness + fallback (nuevo)
+```
+
+### Lógica de Datos
+
+- Fetch server-side desde Supabase con `{ next: { revalidate: 3600 } }`
+- Evaluación de staleness por campo (UF: 2d / AFP: 45d / tasas: 60d)
+- Fallback total si fetch falla
+- Fallback parcial si campo está stale o es null
+
+### Variables de Entorno
+
+```
+SUPABASE_URL=
+SUPABASE_SERVICE_ROLE_KEY=
+```
+
+### Criterios de Éxito Fase 2
+- [ ] Datos cargan desde Supabase en server-side
+- [ ] Fallback total funciona si falla conexión
+- [ ] Fallback parcial funciona por staleness
+- [ ] UF, AFP y tasas independientes
+- [ ] n8n puede actualizar cada campo sin afectar otros
