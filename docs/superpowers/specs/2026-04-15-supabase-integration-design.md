@@ -169,7 +169,7 @@ Logging via `console.warn` en servidor (visible en Vercel logs). Sin exposición
 ```bash
 # .env.local (nunca NEXT_PUBLIC_ — solo server-side)
 SUPABASE_URL=https://xxxx.supabase.co
-SUPABASE_SERVICE_KEY=eyJh...
+SUPABASE_SERVICE_ROLE_KEY=eyJh...
 ```
 
 Agregar a Vercel: Settings → Environment Variables → Production + Preview.
