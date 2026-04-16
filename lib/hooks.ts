@@ -21,7 +21,8 @@ export function useCalculator(params: CalculatorParams): ResultadosCalculo {
         parseFloat(params.saludUF || "0"),
         montoMovilizacion,
         params.bonos,
-        params.pais
+        params.pais,
+        params.config
       )
     }
 
@@ -33,7 +34,8 @@ export function useCalculator(params: CalculatorParams): ResultadosCalculo {
       parseFloat(params.saludUF || "0"),
       montoMovilizacion,
       params.bonos,
-      params.pais
+      params.pais,
+      params.config
     )
   }, [
     params.modo,
@@ -44,6 +46,7 @@ export function useCalculator(params: CalculatorParams): ResultadosCalculo {
     params.movilizacion,
     params.bonos,
     params.pais,
+    params.config,
   ])
 }
 
