@@ -41,6 +41,23 @@ export type Modo = "liquido_a_base" | "base_a_liquido"
 export type Pais = "chile" | "peru" | "brasil"
 export type SistemaSalud = "fonasa" | "isapre"
 
+export interface CountryConfig {
+  afpData: Record<string, number>
+  ufValue: number
+  tasas: {
+    TASA_SALUD_FONASA: number
+    TASA_CESANTIA: number
+    LIMITE_UF_IMPONIBLE: number
+    GRATIFICACION_MAX_UF: number
+    LIMITE_IMPUESTO: number
+    TASA_IMPUESTO: number
+    CESANTIA_EMPLEADOR: number
+    MUTUAL: number
+    SIS: number
+    EXPECTATIVA_VIDA: number
+  }
+}
+
 export interface CalculatorParams {
   modo: Modo
   sueldo: string
@@ -50,4 +67,5 @@ export interface CalculatorParams {
   movilizacion: string
   bonos: Bono[]
   pais: Pais
+  config: CountryConfig
 }
