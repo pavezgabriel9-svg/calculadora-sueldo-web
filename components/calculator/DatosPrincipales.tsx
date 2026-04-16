@@ -13,7 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { AFP_DATA } from "@/lib/config"
 import { formatCLP, formatNumericInput } from "@/lib/utils"
 import { Modo, SistemaSalud } from "@/lib/types"
 
@@ -29,6 +28,7 @@ export function DatosPrincipales({
   onSaludUFChange,
   movilizacion,
   onMovilizacionChange,
+  afpData,
 }: {
   modo: Modo
   sueldo: string
@@ -41,8 +41,9 @@ export function DatosPrincipales({
   onSaludUFChange: (v: string) => void
   movilizacion: string
   onMovilizacionChange: (v: string) => void
+  afpData: Record<string, number>
 }) {
-  const tasaAFP = AFP_DATA[afp] || 0.1049
+  const tasaAFP = afpData[afp] || 0.1049
 
   return (
     <Card>
@@ -81,7 +82,7 @@ export function DatosPrincipales({
                 <SelectValue placeholder="Selecciona AFP" />
               </SelectTrigger>
               <SelectContent>
-                {Object.keys(AFP_DATA).map((afpName) => (
+                {Object.keys(afpData).map((afpName) => (
                   <SelectItem key={afpName} value={afpName}>
                     {afpName}
                   </SelectItem>
