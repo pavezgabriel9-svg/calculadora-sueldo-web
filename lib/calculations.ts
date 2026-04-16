@@ -1,7 +1,6 @@
 // lib/calculations.ts
 
-import { Bono, ResultadosCalculo, Modo, Pais, SistemaSalud } from "./types"
-import { AFP_DATA, CONFIG_POR_PAIS } from "./config"
+import { Bono, ResultadosCalculo, Modo, Pais, SistemaSalud, CountryConfig } from "./types"
 
 export function calcularRemuneracion(
   modo: Modo,
@@ -11,15 +10,16 @@ export function calcularRemuneracion(
   saludUF: number,
   movilizacion: number,
   bonos: Bono[],
-  pais: Pais = "chile"
+  pais: Pais,
+  config: CountryConfig
 ): ResultadosCalculo {
-  const config = CONFIG_POR_PAIS[pais]
-  const tasaAFP = AFP_DATA[afpNombre] || 0.1049
+  const { afpData, ufValue, tasas } = config
+  const tasaAFP = afpData[afpNombre] || 0.1049
 
   const tasaSalud =
     sistemaSalud === "fonasa"
-      ? config.TASA_SALUD_FONASA
-      : Math.max(config.TASA_SALUD_FONASA, (saludUF * config.UF_VALUE) / 1000000)
+      ? tasas.TASA_SALUD_FONASA
+      : Math.max(tasas.TASA_SALUD_FONASA, (saludUF * ufValue) / 1000000)
 
   const bonosImponibles = bonos
     .filter((b) => b.imponible)
@@ -38,26 +38,26 @@ export function calcularRemuneracion(
     // Cálculo directo: Base → Líquido
     const gratificacion = Math.min(
       sueldoBase * 0.25,
-      (config.GRATIFICACION_MAX_UF * config.UF_VALUE) / 12
+      (tasas.GRATIFICACION_MAX_UF * ufValue) / 12
     )
 
     const totalImponible = Math.min(
       sueldoBase + gratificacion + bonosImponibles,
-      config.LIMITE_UF_IMPONIBLE * config.UF_VALUE
+      tasas.LIMITE_UF_IMPONIBLE * ufValue
     )
 
     const descuentoAFP = totalImponible * tasaAFP
     const descuentoSalud =
       sistemaSalud === "fonasa"
         ? totalImponible * 0.07
-        : Math.max(totalImponible * 0.07, saludUF * config.UF_VALUE)
-    const descuentoCesantia = totalImponible * config.TASA_CESANTIA
+        : Math.max(totalImponible * 0.07, saludUF * ufValue)
+    const descuentoCesantia = totalImponible * tasas.TASA_CESANTIA
 
     const totalDescuentos = descuentoAFP + descuentoSalud + descuentoCesantia
     const baseImponible = totalImponible - totalDescuentos
     const impuesto =
-      baseImponible > config.LIMITE_IMPUESTO
-        ? (baseImponible - config.LIMITE_IMPUESTO) * config.TASA_IMPUESTO
+      baseImponible > tasas.LIMITE_IMPUESTO
+        ? (baseImponible - tasas.LIMITE_IMPUESTO) * tasas.TASA_IMPUESTO
         : 0
 
     sueldoLiquido =
@@ -77,26 +77,26 @@ export function calcularRemuneracion(
     for (let i = 0; i < 20; i++) {
       const gratificacion = Math.min(
         sueldoBase * 0.25,
-        (config.GRATIFICACION_MAX_UF * config.UF_VALUE) / 12
+        (tasas.GRATIFICACION_MAX_UF * ufValue) / 12
       )
 
       const totalImponible = Math.min(
         sueldoBase + gratificacion + bonosImponibles,
-        config.LIMITE_UF_IMPONIBLE * config.UF_VALUE
+        tasas.LIMITE_UF_IMPONIBLE * ufValue
       )
 
       const descuentoAFP = totalImponible * tasaAFP
       const descuentoSalud =
         sistemaSalud === "fonasa"
           ? totalImponible * 0.07
-          : Math.max(totalImponible * 0.07, saludUF * config.UF_VALUE)
-      const descuentoCesantia = totalImponible * config.TASA_CESANTIA
+          : Math.max(totalImponible * 0.07, saludUF * ufValue)
+      const descuentoCesantia = totalImponible * tasas.TASA_CESANTIA
 
       const totalDescuentos = descuentoAFP + descuentoSalud + descuentoCesantia
       const baseImponible = totalImponible - totalDescuentos
       const impuesto =
-        baseImponible > config.LIMITE_IMPUESTO
-          ? (baseImponible - config.LIMITE_IMPUESTO) * config.TASA_IMPUESTO
+        baseImponible > tasas.LIMITE_IMPUESTO
+          ? (baseImponible - tasas.LIMITE_IMPUESTO) * tasas.TASA_IMPUESTO
           : 0
 
       const liquidoCalculado =
@@ -117,35 +117,35 @@ export function calcularRemuneracion(
   // Cálculos finales para retorno
   const gratificacion = Math.min(
     sueldoBase * 0.25,
-    (config.GRATIFICACION_MAX_UF * config.UF_VALUE) / 12
+    (tasas.GRATIFICACION_MAX_UF * ufValue) / 12
   )
 
   const totalImponible = Math.min(
     sueldoBase + gratificacion + bonosImponibles,
-    config.LIMITE_UF_IMPONIBLE * config.UF_VALUE
+    tasas.LIMITE_UF_IMPONIBLE * ufValue
   )
 
   const cotizacionPrevisional = Math.round(totalImponible * tasaAFP)
   const cotizacionSalud =
     sistemaSalud === "fonasa"
       ? Math.round(totalImponible * 0.07)
-      : Math.round(Math.max(totalImponible * 0.07, saludUF * config.UF_VALUE))
-  const cesantia = Math.round(totalImponible * config.TASA_CESANTIA)
+      : Math.round(Math.max(totalImponible * 0.07, saludUF * ufValue))
+  const cesantia = Math.round(totalImponible * tasas.TASA_CESANTIA)
 
   const totalDescuentos = cotizacionPrevisional + cotizacionSalud + cesantia
   const baseImponible = totalImponible - totalDescuentos
   const impuesto =
-    baseImponible > config.LIMITE_IMPUESTO
-      ? Math.round((baseImponible - config.LIMITE_IMPUESTO) * config.TASA_IMPUESTO)
+    baseImponible > tasas.LIMITE_IMPUESTO
+      ? Math.round((baseImponible - tasas.LIMITE_IMPUESTO) * tasas.TASA_IMPUESTO)
       : 0
 
   // Costos patronales
   const cesantiaEmpleador = Math.round(
-    totalImponible * config.CESANTIA_EMPLEADOR
+    totalImponible * tasas.CESANTIA_EMPLEADOR
   )
-  const mutual = Math.round(totalImponible * config.MUTUAL)
-  const sis = Math.round(totalImponible * config.SIS)
-  const expectativaVida = Math.round(totalImponible * config.EXPECTATIVA_VIDA)
+  const mutual = Math.round(totalImponible * tasas.MUTUAL)
+  const sis = Math.round(totalImponible * tasas.SIS)
+  const expectativaVida = Math.round(totalImponible * tasas.EXPECTATIVA_VIDA)
   const afpEmpleador = 0
   const seguroComplementario = 0
   const totalPatronal =
