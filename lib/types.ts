@@ -7,6 +7,13 @@ export interface Bono {
   imponible: boolean
 }
 
+export interface TramosImpuesto {
+  desde: number
+  hasta: number
+  tasa: number
+  rebaja: number
+}
+
 export interface ResultadosCalculo {
   sueldoBase: number
   sueldoLiquido: number
@@ -44,17 +51,21 @@ export type SistemaSalud = "fonasa" | "isapre"
 export interface CountryConfig {
   afpData: Record<string, number>
   ufValue: number
+  dolarValue: number
+  taxBrackets: TramosImpuesto[]
   tasas: {
     TASA_SALUD_FONASA: number
     TASA_CESANTIA: number
-    LIMITE_UF_IMPONIBLE: number
+    TOPE_AFP_SALUD_UF: number
+    TOPE_CESANTIA_UF: number
     GRATIFICACION_MAX_UF: number
-    LIMITE_IMPUESTO: number
-    TASA_IMPUESTO: number
+    SUELDO_MINIMO: number
     CESANTIA_EMPLEADOR: number
     MUTUAL: number
     SIS: number
     EXPECTATIVA_VIDA: number
+    AFP_EMPLEADOR: number
+    SEGURO_COMPLEMENTARIO_UF: number
   }
 }
 
