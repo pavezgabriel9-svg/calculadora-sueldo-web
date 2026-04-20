@@ -25,8 +25,7 @@ export function CalculadoraClient({ config }: { config: CountryConfig }) {
   const [saludUF, setSaludUF] = useState("")
   const [movilizacion, setMovilizacion] = useState("40.000")
   const [bonos, setBonos] = useState<Bono[]>([
-    { id: "1", nombre: "Producción", monto: 100000, imponible: true },
-    { id: "2", nombre: "Colación", monto: 50000, imponible: false },
+    //{ id: "1", nombre: "Producción", monto: 100000, imponible: true },
   ])
 
   const resultados = useCalculator({
