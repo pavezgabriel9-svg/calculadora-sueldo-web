@@ -34,7 +34,7 @@ export function Header({
           </div>
 
           <div className="flex items-center gap-4">
-            <Badge className="bg-emerald-500 hover:bg-emerald-500 text-white">
+            <Badge className="!bg-emerald-500 text-white border-transparent">
               <span className="h-2 w-2 bg-white rounded-full mr-2 animate-pulse" />
               ONLINE
             </Badge>
