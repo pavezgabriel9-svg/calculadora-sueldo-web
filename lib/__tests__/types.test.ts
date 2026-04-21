@@ -1,5 +1,5 @@
 import { describe, it, expectTypeOf } from 'vitest'
-import type { CountryConfig, TramosImpuesto } from '../types'
+import type { CountryConfig, TramosImpuesto, Moneda } from '../types'
 
 describe('CountryConfig shape', () => {
   it('TramosImpuesto has required fields', () => {
@@ -20,5 +20,11 @@ describe('CountryConfig shape', () => {
     expectTypeOf<CountryConfig['tasas']>().toHaveProperty('SUELDO_MINIMO')
     expectTypeOf<CountryConfig['tasas']>().toHaveProperty('AFP_EMPLEADOR')
     expectTypeOf<CountryConfig['tasas']>().toHaveProperty('SEGURO_COMPLEMENTARIO_UF')
+  })
+})
+
+describe('Moneda type', () => {
+  it('Moneda is CLP or USD', () => {
+    expectTypeOf<Moneda>().toEqualTypeOf<'CLP' | 'USD'>()
   })
 })

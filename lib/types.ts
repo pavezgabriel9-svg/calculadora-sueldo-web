@@ -47,6 +47,7 @@ export interface ResultadosCalculo {
 export type Modo = "liquido_a_base" | "base_a_liquido"
 export type Pais = "chile" | "peru" | "brasil"
 export type SistemaSalud = "fonasa" | "isapre"
+export type Moneda = 'CLP' | 'USD'
 
 export interface CountryConfig {
   afpData: Record<string, number>
