@@ -3,15 +3,22 @@
 import { Shield, TrendingDown, TrendingUp } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { formatCLP } from "@/lib/utils"
-import { ResultadosCalculo, Modo } from "@/lib/types"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { formatCLP, formatUSD } from "@/lib/utils"
+import { ResultadosCalculo, Modo, Moneda } from "@/lib/types"
 
 export function Resultados({
   modo,
   resultados,
+  moneda,
+  onMonedaChange,
+  dolarValue,
 }: {
   modo: Modo
   resultados: ResultadosCalculo
+  moneda: Moneda
+  onMonedaChange: (m: Moneda) => void
+  dolarValue: number
 }) {
   const headerColor =
     modo === "base_a_liquido"
@@ -23,10 +30,37 @@ export function Resultados({
       ? "CÁLCULO: BASE → LÍQUIDO"
       : "CÁLCULO: LÍQUIDO → BASE"
 
+  const format = (value: number): string =>
+    moneda === 'CLP' ? formatCLP(value) : formatUSD(value / dolarValue)
+
+  const dolarFormateado = formatCLP(dolarValue)
+
   return (
     <Card className="sticky top-4">
       <div className={`${headerColor} text-white rounded-t-lg p-4`}>
-        <h2 className="text-lg font-bold text-center">{headerTitle}</h2>
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="text-lg font-bold">{headerTitle}</h2>
+          <ToggleGroup
+            type="single"
+            value={moneda}
+            onValueChange={(v) => v && onMonedaChange(v as Moneda)}
+            className="shrink-0"
+          >
+            <ToggleGroupItem
+              value="CLP"
+              className="h-7 px-3 text-xs font-semibold text-white border-white/40 data-[state=on]:bg-white/30 data-[state=on]:text-white hover:bg-white/20 hover:text-white"
+            >
+              CLP
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="USD"
+              className="h-7 px-3 text-xs font-semibold text-white border-white/40 data-[state=on]:bg-white/30 data-[state=on]:text-white hover:bg-white/20 hover:text-white"
+            >
+              USD
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
+        <p className="text-xs text-white/60 mt-1">1 USD = {dolarFormateado}</p>
       </div>
 
       <CardContent className="p-4 space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto">
@@ -38,12 +72,14 @@ export function Resultados({
                 label="Sueldo Base (entrada)"
                 value={resultados.sueldoBase}
                 variant="entrada"
+                format={format}
               />
               <Separator />
               <ResultRow
                 label="SUELDO LÍQUIDO"
                 value={resultados.sueldoLiquido}
                 variant="principal"
+                format={format}
               />
             </>
           ) : (
@@ -52,12 +88,14 @@ export function Resultados({
                 label="Líquido Objetivo (entrada)"
                 value={resultados.sueldoLiquido}
                 variant="entrada"
+                format={format}
               />
               <Separator />
               <ResultRow
                 label="SUELDO BASE"
                 value={resultados.sueldoBase}
                 variant="principal"
+                format={format}
               />
             </>
           )}
@@ -70,6 +108,7 @@ export function Resultados({
           label="COSTO TOTAL EMPRESA"
           value={resultados.costoTotalEmpresa}
           variant="total-header"
+          format={format}
         />
 
         <Separator />
@@ -80,29 +119,33 @@ export function Resultados({
             icon={<TrendingUp className="h-4 w-4" />}
             title="HABERES"
           />
-          <ResultRow label="Gratificación" value={resultados.gratificacion} />
+          <ResultRow label="Gratificación" value={resultados.gratificacion} format={format} />
           {resultados.bonosImponibles > 0 && (
             <ResultRow
               label="Bonos Imponibles"
               value={resultados.bonosImponibles}
+              format={format}
             />
           )}
           <ResultRow
             label="Total Haberes Imponibles"
             value={resultados.totalHaberesImponibles}
             variant="total"
+            format={format}
           />
-          <ResultRow label="Movilización" value={resultados.movilizacion} />
+          <ResultRow label="Movilización" value={resultados.movilizacion} format={format} />
           {resultados.bonosNoImponibles > 0 && (
             <ResultRow
               label="Bonos No Imponibles"
               value={resultados.bonosNoImponibles}
+              format={format}
             />
           )}
           <ResultRow
             label="Total Haberes"
             value={resultados.totalHaberes}
             variant="total"
+            format={format}
           />
         </div>
 
@@ -117,17 +160,20 @@ export function Resultados({
           <ResultRow
             label="Cotización Previsional (AFP)"
             value={resultados.cotizacionPrevisional}
+            format={format}
           />
           <ResultRow
             label="Cotización Salud"
             value={resultados.cotizacionSalud}
+            format={format}
           />
-          <ResultRow label="Seguro Cesantía" value={resultados.cesantia} />
-          <ResultRow label="Impuesto Único" value={resultados.impuesto} />
+          <ResultRow label="Seguro Cesantía" value={resultados.cesantia} format={format} />
+          <ResultRow label="Impuesto Único" value={resultados.impuesto} format={format} />
           <ResultRow
             label="Total Descuentos"
             value={resultados.totalDescuentos}
             variant="descuento"
+            format={format}
           />
         </div>
 
@@ -142,25 +188,30 @@ export function Resultados({
           <ResultRow
             label="Seguro Cesantía Empleador"
             value={resultados.cesantiaEmpleador}
+            format={format}
           />
-          <ResultRow label="Mutual" value={resultados.mutual} />
-          <ResultRow label="SIS" value={resultados.sis} />
+          <ResultRow label="Mutual" value={resultados.mutual} format={format} />
+          <ResultRow label="SIS" value={resultados.sis} format={format} />
           <ResultRow
             label="Cotización Expectativa Vida"
             value={resultados.expectativaVida}
+            format={format}
           />
           <ResultRow
             label="Aporte AFP Empleador"
             value={resultados.afpEmpleador}
+            format={format}
           />
           <ResultRow
             label="Seguro Complementario Salud"
             value={resultados.seguroComplementario}
+            format={format}
           />
           <ResultRow
             label="TOTAL COSTOS PATRONALES"
             value={resultados.totalPatronal}
             variant="total"
+            format={format}
           />
         </div>
       </CardContent>
@@ -187,10 +238,12 @@ function ResultRow({
   label,
   value,
   variant = "normal",
+  format,
 }: {
   label: string
   value: number
   variant?: "normal" | "entrada" | "principal" | "total" | "total-header" | "descuento"
+  format: (v: number) => string
 }) {
   const valueClasses = {
     normal: "text-foreground",
@@ -213,7 +266,7 @@ function ResultRow({
   return (
     <div className="flex items-center justify-between py-0.5">
       <span className={labelClasses[variant]}>{label}</span>
-      <span className={valueClasses[variant]}>{formatCLP(value)}</span>
+      <span className={valueClasses[variant]}>{format(value)}</span>
     </div>
   )
 }
