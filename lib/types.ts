@@ -7,6 +7,12 @@ export interface Bono {
   imponible: boolean
 }
 
+export interface BonoAnual {
+  montoImponible: number
+  descuentoTrabajador: number
+  costoEmpresa: number
+}
+
 export interface ResultadosCalculo {
   sueldoBase: number
   sueldoLiquido: number
@@ -33,8 +39,14 @@ export interface ResultadosCalculo {
   seguroComplementario: number
   totalPatronal: number
 
-  // Total
+  // Total mensual
   costoTotalEmpresa: number
+
+  // Bonos anuales fijos
+  bonoNavidad: BonoAnual
+  bonoFiestasPatrias: BonoAnual
+  bonoEscolaridad: BonoAnual
+  costoTotalEmpresaAnual: number
 }
 
 export type Modo = "liquido_a_base" | "base_a_liquido"
@@ -44,11 +56,17 @@ export type SistemaSalud = "fonasa" | "isapre"
 export interface CountryConfig {
   afpData: Record<string, number>
   ufValue: number
+  bonosAnualesUF: {
+    navidad: number
+    fiestaPatrias: number
+    escolaridad: number
+  }
   tasas: {
     TASA_SALUD_FONASA: number
     TASA_CESANTIA: number
     LIMITE_UF_IMPONIBLE: number
-    GRATIFICACION_MAX_UF: number
+    GRATIFICACION_MAX_IMM: number
+    SUELDO_MINIMO: number
     LIMITE_IMPUESTO: number
     TASA_IMPUESTO: number
     CESANTIA_EMPLEADOR: number

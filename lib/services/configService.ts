@@ -2,7 +2,7 @@
 
 import { unstable_cache } from 'next/cache'
 import { supabase } from '@/lib/supabase'
-import { AFP_DATA, CONFIG_POR_PAIS } from '@/lib/config'
+import { AFP_DATA, BONOS_ANUALES_UF_DEFAULT, CONFIG_POR_PAIS } from '@/lib/config'
 import { CountryConfig, Pais } from '@/lib/types'
 
 // Umbrales de staleness en días
@@ -23,11 +23,13 @@ function getFallback(pais: Pais): CountryConfig {
   return {
     afpData: pais === 'chile' ? AFP_DATA : {},
     ufValue: tasas.UF_VALUE,
+    bonosAnualesUF: BONOS_ANUALES_UF_DEFAULT,
     tasas: {
       TASA_SALUD_FONASA: tasas.TASA_SALUD_FONASA,
       TASA_CESANTIA: tasas.TASA_CESANTIA,
       LIMITE_UF_IMPONIBLE: tasas.LIMITE_UF_IMPONIBLE,
-      GRATIFICACION_MAX_UF: tasas.GRATIFICACION_MAX_UF,
+      GRATIFICACION_MAX_IMM: tasas.GRATIFICACION_MAX_IMM,
+      SUELDO_MINIMO: tasas.SUELDO_MINIMO,
       LIMITE_IMPUESTO: tasas.LIMITE_IMPUESTO,
       TASA_IMPUESTO: tasas.TASA_IMPUESTO,
       CESANTIA_EMPLEADOR: tasas.CESANTIA_EMPLEADOR,
@@ -51,7 +53,7 @@ async function fetchCountryConfig(pais: Pais): Promise<CountryConfig> {
   try {
     const { data, error } = await supabase
       .from('country_config')
-      .select('afp_data, afp_updated_at, uf_value, uf_updated_at, tasas, tasas_updated_at')
+      .select('afp_data, afp_updated_at, uf_value, uf_updated_at, tasas, tasas_updated_at, bonos_anuales_uf')
       .eq('pais', pais)
       .single()
       // Nota: el cliente Supabase no expone `next.revalidate` directamente.
@@ -85,7 +87,11 @@ async function fetchCountryConfig(pais: Pais): Promise<CountryConfig> {
     ? (console.warn(`[config] tasas stale or null for pais=${pais}, using fallback`), fallback.tasas)
     : (row.tasas as CountryConfig['tasas'])
 
-  return { afpData, ufValue, tasas }
+  const bonosAnualesUF = row.bonos_anuales_uf
+    ? (row.bonos_anuales_uf as CountryConfig['bonosAnualesUF'])
+    : fallback.bonosAnualesUF
+
+  return { afpData, ufValue, bonosAnualesUF, tasas }
 }
 
 // Exportar envuelto en unstable_cache para revalidar cada 1 hora

@@ -1,6 +1,26 @@
 // lib/calculations.ts
 
-import { Bono, ResultadosCalculo, Modo, Pais, SistemaSalud, CountryConfig } from "./types"
+import { Bono, BonoAnual, ResultadosCalculo, Modo, Pais, SistemaSalud, CountryConfig } from "./types"
+
+function calcularBonoAnual(
+  ufAmount: number,
+  ufValue: number,
+  tasaAFP: number,
+  tasas: CountryConfig['tasas']
+): BonoAnual {
+  const montoImponible = Math.round(ufAmount * ufValue)
+  const descuentoTrabajador = Math.round(
+    montoImponible * (tasaAFP + tasas.TASA_SALUD_FONASA + tasas.TASA_CESANTIA)
+  )
+  const costoPatronal = Math.round(
+    montoImponible * (tasas.CESANTIA_EMPLEADOR + tasas.MUTUAL + tasas.SIS + tasas.EXPECTATIVA_VIDA)
+  )
+  return {
+    montoImponible,
+    descuentoTrabajador,
+    costoEmpresa: montoImponible + costoPatronal,
+  }
+}
 
 export function calcularRemuneracion(
   modo: Modo,
@@ -38,7 +58,7 @@ export function calcularRemuneracion(
     // Cálculo directo: Base → Líquido
     const gratificacion = Math.min(
       sueldoBase * 0.25,
-      (tasas.GRATIFICACION_MAX_UF * ufValue) / 12
+      (tasas.GRATIFICACION_MAX_IMM * tasas.SUELDO_MINIMO) / 12
     )
 
     const totalImponible = Math.min(
@@ -77,7 +97,7 @@ export function calcularRemuneracion(
     for (let i = 0; i < 20; i++) {
       const gratificacion = Math.min(
         sueldoBase * 0.25,
-        (tasas.GRATIFICACION_MAX_UF * ufValue) / 12
+        (tasas.GRATIFICACION_MAX_IMM * tasas.SUELDO_MINIMO) / 12
       )
 
       const totalImponible = Math.min(
@@ -117,7 +137,7 @@ export function calcularRemuneracion(
   // Cálculos finales para retorno
   const gratificacion = Math.min(
     sueldoBase * 0.25,
-    (tasas.GRATIFICACION_MAX_UF * ufValue) / 12
+    (tasas.GRATIFICACION_MAX_IMM * tasas.SUELDO_MINIMO) / 12
   )
 
   const totalImponible = Math.min(
@@ -160,6 +180,16 @@ export function calcularRemuneracion(
     sueldoBase + gratificacion + bonosImponibles + bonosNoImponibles + movilizacion
   const costoTotalEmpresa = totalHaberes + totalPatronal
 
+  const bonoNavidad = calcularBonoAnual(config.bonosAnualesUF.navidad, ufValue, tasaAFP, tasas)
+  const bonoFiestasPatrias = calcularBonoAnual(config.bonosAnualesUF.fiestaPatrias, ufValue, tasaAFP, tasas)
+  const bonoEscolaridad = calcularBonoAnual(config.bonosAnualesUF.escolaridad, ufValue, tasaAFP, tasas)
+
+  const costoTotalEmpresaAnual =
+    Math.round(costoTotalEmpresa) * 12 +
+    bonoNavidad.costoEmpresa +
+    bonoFiestasPatrias.costoEmpresa +
+    bonoEscolaridad.costoEmpresa
+
   return {
     sueldoBase: Math.round(sueldoBase),
     sueldoLiquido:
@@ -185,5 +215,9 @@ export function calcularRemuneracion(
     seguroComplementario,
     totalPatronal,
     costoTotalEmpresa: Math.round(costoTotalEmpresa),
+    bonoNavidad,
+    bonoFiestasPatrias,
+    bonoEscolaridad,
+    costoTotalEmpresaAnual,
   }
 }
