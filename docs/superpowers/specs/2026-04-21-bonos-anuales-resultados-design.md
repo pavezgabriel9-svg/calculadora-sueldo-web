@@ -19,9 +19,9 @@ La calculadora de sueldo chilena actualmente muestra resultados mensuales detall
 
 ### Definición
 
-Tres bonos imponibles de pago anual, hardcodeados (no aparecen en los parámetros de entrada del usuario):
+Tres bonos imponibles de pago anual. Sus valores en UF viven en Supabase (tabla `country_config`) junto con el resto de la configuración dinámica, con fallback a los valores por defecto en `lib/config.ts`. No aparecen en los parámetros de entrada del usuario.
 
-| Bono | Monto |
+| Bono | Valor por defecto |
 |---|---|
 | Bono Navidad | 7 UF |
 | Bono Fiestas Patrias | 6 UF |
@@ -74,6 +74,18 @@ bonoNavidad: BonoAnual
 bonoFiestasPatrias: BonoAnual
 bonoEscolaridad: BonoAnual
 costoTotalEmpresaAnual: number
+```
+
+### Extensión de `CountryConfig` en `lib/types.ts`
+
+Agregar campo para que los valores UF de los bonos fluyan desde Supabase:
+
+```typescript
+bonosAnualesUF: {
+  navidad: number        // default 7
+  fiestaPatrias: number  // default 6
+  escolaridad: number    // default 3
+}
 ```
 
 ---
@@ -133,9 +145,10 @@ Cada sección tiene su propio toggle. Se pueden abrir/cerrar de forma independie
 
 | Archivo | Tipo de cambio |
 |---|---|
-| `lib/types.ts` | Agregar `BonoAnual`, extender `ResultadosCalculo` |
-| `lib/config.ts` | Agregar constante `BONOS_ANUALES_UF = { navidad: 7, fiestaPatrias: 6, escolaridad: 3 }` |
-| `lib/calculations.ts` | Agregar `calcularBonoAnual()`, integrar al `calcularRemuneracion()` |
+| `lib/types.ts` | Agregar `BonoAnual`, extender `ResultadosCalculo` y `CountryConfig` |
+| `lib/config.ts` | Agregar fallback `BONOS_ANUALES_UF_DEFAULT = { navidad: 7, fiestaPatrias: 6, escolaridad: 3 }` |
+| `lib/services/configService.ts` | Leer `bonosAnualesUF` desde Supabase y mapear a `CountryConfig`, con fallback a los valores por defecto |
+| `lib/calculations.ts` | Agregar `calcularBonoAnual()`, leer UF desde `config.bonosAnualesUF`, integrar al resultado |
 | `components/calculator/Resultados.tsx` | Rediseño completo con acordeones por sección |
 
 ### Archivos sin cambios
@@ -144,13 +157,13 @@ Cada sección tiene su propio toggle. Se pueden abrir/cerrar de forma independie
 - `app/calculadora-client.tsx` — Sin cambios
 - `components/calculator/DatosPrincipales.tsx` — Sin cambios
 - `components/calculator/Bonos.tsx` — Sin cambios
-- `lib/services/configService.ts` — Sin cambios (el `ufValue` ya se propaga correctamente)
 
 ---
 
 ## 5. Notas de Implementación
 
-- El valor UF para los bonos anuales se toma del mismo `config.ufValue` que ya usa el cálculo mensual
+- Los valores UF de los bonos anuales viven en Supabase (`country_config`) y se propagan via `CountryConfig.bonosAnualesUF`; si Supabase no los retorna, se usa el fallback de `lib/config.ts`
+- El valor UF (precio en CLP) se toma del mismo `config.ufValue` que ya usa el cálculo mensual
 - Los bonos anuales no modifican el cálculo mensual — son adicionales, solo visibles en la sección anual
 - El acordeón se implementa con estado local en `Resultados.tsx` (no necesita subir al estado global)
 - Mantener compatibilidad con dark mode y los colores existentes del sistema de diseño
