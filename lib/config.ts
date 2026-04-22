@@ -1,4 +1,5 @@
-// lib/config.ts
+// lib/config.ts — solo fallback offline
+import { CountryConfig, Pais } from './types'
 
 import { Pais, TramosImpuesto } from "./types"
 

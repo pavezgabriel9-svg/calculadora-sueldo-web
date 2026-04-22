@@ -22,3 +22,12 @@ export const formatNumericInput = (value: string): string => {
 export const cn = (...classes: (string | undefined | false)[]): string => {
   return classes.filter((cls) => typeof cls === "string").join(" ")
 }
+
+export const formatUSD = (value: number): string => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value)
+}

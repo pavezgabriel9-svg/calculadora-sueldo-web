@@ -6,15 +6,22 @@ import { useState } from "react"
 import { ChevronDown, Shield, TrendingDown, TrendingUp, Calendar } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { formatCLP } from "@/lib/utils"
-import { ResultadosCalculo, Modo } from "@/lib/types"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { formatCLP, formatUSD } from "@/lib/utils"
+import { ResultadosCalculo, Modo, Moneda } from "@/lib/types"
 
 export function Resultados({
   modo,
   resultados,
+  moneda,
+  onMonedaChange,
+  dolarValue,
 }: {
   modo: Modo
   resultados: ResultadosCalculo
+  moneda: Moneda
+  onMonedaChange: (m: Moneda) => void
+  dolarValue: number
 }) {
   const [openSections, setOpenSections] = useState<Set<string>>(new Set())
 
@@ -44,7 +51,29 @@ export function Resultados({
   return (
     <Card className="sticky top-4">
       <div className={`${headerColor} text-white rounded-t-lg p-4`}>
-        <h2 className="text-lg font-bold text-center">{headerTitle}</h2>
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="text-lg font-bold">{headerTitle}</h2>
+          <ToggleGroup
+            type="single"
+            value={moneda}
+            onValueChange={(v) => v && onMonedaChange(v as Moneda)}
+            className="shrink-0"
+          >
+            <ToggleGroupItem
+              value="CLP"
+              className="h-7 px-3 text-xs font-semibold text-white border-white/40 data-[state=on]:bg-white/30 data-[state=on]:text-white hover:bg-white/20 hover:text-white"
+            >
+              CLP
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="USD"
+              className="h-7 px-3 text-xs font-semibold text-white border-white/40 data-[state=on]:bg-white/30 data-[state=on]:text-white hover:bg-white/20 hover:text-white"
+            >
+              USD
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
+        <p className="text-xs text-white/60 mt-1">1 USD = {dolarFormateado}</p>
       </div>
 
       <CardContent className="p-4 space-y-1 max-h-[calc(100vh-200px)] overflow-y-auto">
@@ -261,10 +290,12 @@ function ResultRow({
   label,
   value,
   variant = "normal",
+  format,
 }: {
   label: string
   value: number
   variant?: "normal" | "entrada" | "principal" | "total" | "total-header" | "descuento"
+  format: (v: number) => string
 }) {
   const valueClasses = {
     normal: "text-foreground",
@@ -287,7 +318,7 @@ function ResultRow({
   return (
     <div className="flex items-center justify-between py-0.5">
       <span className={labelClasses[variant]}>{label}</span>
-      <span className={valueClasses[variant]}>{formatCLP(value)}</span>
+      <span className={valueClasses[variant]}>{format(value)}</span>
     </div>
   )
 }

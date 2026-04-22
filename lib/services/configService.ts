@@ -43,7 +43,7 @@ function getFallback(pais: Pais): CountryConfig {
 }
 
 async function fetchCountryConfig(pais: Pais): Promise<CountryConfig> {
-  const fallback = getFallback(pais)
+  const fallback = FALLBACK_CONFIG[pais]
 
   if (!supabase) {
     console.warn(`[config] supabase client not initialized, using full fallback for pais=${pais}`)
@@ -82,6 +82,10 @@ async function fetchCountryConfig(pais: Pais): Promise<CountryConfig> {
   const ufValue = isStale(row.uf_updated_at as string, STALE_THRESHOLDS.uf)
     ? (console.warn(`[config] uf_value stale for pais=${pais}, using fallback`), fallback.ufValue)
     : (row.uf_value as number)
+
+  const dolarValue = isStale(row.dolar_updated_at as string, STALE_THRESHOLDS.dolar)
+    ? (console.warn(`[config] dolar_value stale for pais=${pais}, using fallback`), fallback.dolarValue)
+    : ((row.dolar_value as number) ?? fallback.dolarValue)
 
   const tasas = isStale(row.tasas_updated_at as string, STALE_THRESHOLDS.tasas)
     ? (console.warn(`[config] tasas stale for pais=${pais}, using fallback`), fallback.tasas)

@@ -11,7 +11,7 @@ import {
 } from "@/components/calculator"
 import { useCalculator, useDarkMode } from "@/lib/hooks"
 import { formatNumericInput } from "@/lib/utils"
-import { Bono, Pais, Modo, SistemaSalud, CountryConfig } from "@/lib/types"
+import { Bono, Pais, Modo, SistemaSalud, CountryConfig, Moneda } from "@/lib/types"
 
 // TODO(fase3): re-fetch config when pais changes (actualmente solo carga config de 'chile' desde el servidor)
 export function CalculadoraClient({ config }: { config: CountryConfig }) {
@@ -25,9 +25,9 @@ export function CalculadoraClient({ config }: { config: CountryConfig }) {
   const [saludUF, setSaludUF] = useState("")
   const [movilizacion, setMovilizacion] = useState("40.000")
   const [bonos, setBonos] = useState<Bono[]>([
-    { id: "1", nombre: "Producción", monto: 100000, imponible: true },
-    { id: "2", nombre: "Colación", monto: 50000, imponible: false },
+    //{ id: "1", nombre: "Producción", monto: 100000, imponible: true },
   ])
+  const [moneda, setMoneda] = useState<Moneda>('CLP')
 
   const resultados = useCalculator({
     modo,
@@ -86,7 +86,13 @@ export function CalculadoraClient({ config }: { config: CountryConfig }) {
           </div>
 
           <div className="lg:col-span-2">
-            <Resultados modo={modo} resultados={resultados} />
+            <Resultados
+              modo={modo}
+              resultados={resultados}
+              moneda={moneda}
+              onMonedaChange={setMoneda}
+              dolarValue={config.dolarValue}
+            />
           </div>
         </div>
       </main>
