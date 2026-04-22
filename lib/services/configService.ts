@@ -27,7 +27,8 @@ function getFallback(pais: Pais): CountryConfig {
     tasas: {
       TASA_SALUD_FONASA: tasas.TASA_SALUD_FONASA,
       TASA_CESANTIA: tasas.TASA_CESANTIA,
-      LIMITE_UF_IMPONIBLE: tasas.LIMITE_UF_IMPONIBLE,
+      TOPE_AFP_SALUD_UF: tasas.TOPE_AFP_SALUD_UF,
+      TOPE_CESANTIA_UF: tasas.TOPE_CESANTIA_UF,
       GRATIFICACION_MAX_IMM: tasas.GRATIFICACION_MAX_IMM,
       SUELDO_MINIMO: tasas.SUELDO_MINIMO,
       LIMITE_IMPUESTO: tasas.LIMITE_IMPUESTO,
@@ -36,6 +37,8 @@ function getFallback(pais: Pais): CountryConfig {
       MUTUAL: tasas.MUTUAL,
       SIS: tasas.SIS,
       EXPECTATIVA_VIDA: tasas.EXPECTATIVA_VIDA,
+      AFP_EMPLEADOR: tasas.AFP_EMPLEADOR,
+      SEGURO_COMPLEMENTARIO_UF: tasas.SEGURO_COMPLEMENTARIO_UF,
     },
   }
 }

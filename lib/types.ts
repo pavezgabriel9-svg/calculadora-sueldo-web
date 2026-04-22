@@ -64,7 +64,8 @@ export interface CountryConfig {
   tasas: {
     TASA_SALUD_FONASA: number
     TASA_CESANTIA: number
-    LIMITE_UF_IMPONIBLE: number
+    TOPE_AFP_SALUD_UF: number
+    TOPE_CESANTIA_UF: number
     GRATIFICACION_MAX_IMM: number
     SUELDO_MINIMO: number
     LIMITE_IMPUESTO: number
@@ -73,6 +74,8 @@ export interface CountryConfig {
     MUTUAL: number
     SIS: number
     EXPECTATIVA_VIDA: number
+    AFP_EMPLEADOR: number
+    SEGURO_COMPLEMENTARIO_UF: number
   }
 }
 
