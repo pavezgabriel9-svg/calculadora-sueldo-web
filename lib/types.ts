@@ -39,6 +39,10 @@ export interface ResultadosCalculo {
   seguroComplementario: number
   totalPatronal: number
 
+  // Provisión gratificaciones (Perú: 2 sueldos/12, Chile: 0)
+  provisionGratificaciones: number
+  essaludGratificaciones: number
+
   // Total mensual
   costoTotalEmpresa: number
 
@@ -51,7 +55,7 @@ export interface ResultadosCalculo {
 
 export type Modo = "liquido_a_base" | "base_a_liquido"
 export type Pais = "chile" | "peru" | "brasil"
-export type SistemaSalud = "fonasa" | "isapre"
+export type SistemaSalud = "fonasa" | "isapre" | "essalud"
 
 export interface TramoImpuesto {
   desde_uf?: number
@@ -62,6 +66,7 @@ export interface TramoImpuesto {
 export interface CountryConfig {
   afpData: Record<string, number>
   ufValue: number
+  dolarRate: number
   bonosAnualesUF?: {
     navidad: number
     fiestaPatrias: number

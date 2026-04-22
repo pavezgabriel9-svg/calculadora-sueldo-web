@@ -108,6 +108,12 @@ export const CONFIG_POR_PAIS = {
   brasil: TASAS_BRASIL,
 }
 
+export const DOLAR_RATE_FALLBACK: Record<string, number> = {
+  chile: 960,
+  peru: 3.44,
+  brasil: 5.8,
+}
+
 export const BONOS_ANUALES_UF_DEFAULT = {
   navidad: 7,
   fiestaPatrias: 6,

@@ -131,7 +131,11 @@ export function calcularRemuneracion(
     // Se calcula sobre base mínima RMV
     const saludPatronal = calcularSaludPatronalPeru(sueldoBase, config)
 
-    // Impuesto a la renta anual de quinta categoría
+    // Gratificaciones: (SUELDOS_ANUALES - 12) sueldos extra al año — valor anual completo
+    const sueldosGratificaciones = (config.tasas.SUELDOS_ANUALES || 14) - 12
+    const gratificacionesAnuales = Math.round(sueldoBase * sueldosGratificaciones)
+
+    // Impuesto a la renta anual de quinta categoría (base = sueldo * 14)
     const { impuestoMensual } = calcularImpuestoRentaPeruAnual(sueldoBase, config)
 
     // Total descuentos trabajador (AFP + Seguros + Impuesto)
@@ -139,7 +143,7 @@ export function calcularRemuneracion(
 
     sueldoLiquido = sueldoBase + bonosImponibles + bonosNoImponibles + movilizacion - totalDescuentos
 
-    // Costos patronales: solo salud en Perú (los demás son cero)
+    // Costos patronales mensuales: solo EsSalud sobre remuneración mensual
     const cesantiaEmpleador = 0
     const mutual = 0
     const sis = 0
@@ -151,24 +155,8 @@ export function calcularRemuneracion(
     const totalHaberes = sueldoBase + bonosImponibles + bonosNoImponibles + movilizacion
     const costoTotalEmpresa = totalHaberes + totalPatronal
 
-    // Bonos anuales no aplican en Perú
-    const bonoNavidad: BonoAnual = {
-      montoImponible: 0,
-      descuentoTrabajador: 0,
-      costoEmpresa: 0,
-    }
-    const bonoFiestasPatrias: BonoAnual = {
-      montoImponible: 0,
-      descuentoTrabajador: 0,
-      costoEmpresa: 0,
-    }
-    const bonoEscolaridad: BonoAnual = {
-      montoImponible: 0,
-      descuentoTrabajador: 0,
-      costoEmpresa: 0,
-    }
-
-    const costoTotalEmpresaAnual = Math.round(costoTotalEmpresa * 12)
+    // Costo anual = mensual * 12 + gratificaciones anuales (2 sueldos)
+    const costoTotalEmpresaAnual = Math.round(costoTotalEmpresa * 12) + gratificacionesAnuales
 
     return {
       sueldoBase: Math.round(sueldoBase),
@@ -190,11 +178,13 @@ export function calcularRemuneracion(
       expectativaVida,
       afpEmpleador,
       seguroComplementario,
+      provisionGratificaciones: gratificacionesAnuales,
+      essaludGratificaciones: 0,
       totalPatronal,
       costoTotalEmpresa: Math.round(costoTotalEmpresa),
-      bonoNavidad,
-      bonoFiestasPatrias,
-      bonoEscolaridad,
+      bonoNavidad: { montoImponible: 0, descuentoTrabajador: 0, costoEmpresa: 0 },
+      bonoFiestasPatrias: { montoImponible: 0, descuentoTrabajador: 0, costoEmpresa: 0 },
+      bonoEscolaridad: { montoImponible: 0, descuentoTrabajador: 0, costoEmpresa: 0 },
       costoTotalEmpresaAnual,
     }
   } else {
@@ -359,6 +349,8 @@ export function calcularRemuneracion(
       expectativaVida,
       afpEmpleador,
       seguroComplementario,
+      provisionGratificaciones: 0,
+      essaludGratificaciones: 0,
       totalPatronal,
       costoTotalEmpresa: Math.round(costoTotalEmpresa),
       bonoNavidad,

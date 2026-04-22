@@ -2,7 +2,7 @@
 
 import { unstable_cache } from 'next/cache'
 import { supabase } from '@/lib/supabase'
-import { AFP_DATA, AFP_PERU_DATA, BONOS_ANUALES_UF_DEFAULT, CONFIG_POR_PAIS, TRAMOS_IMPUESTO_PERU } from '@/lib/config'
+import { AFP_DATA, AFP_PERU_DATA, BONOS_ANUALES_UF_DEFAULT, CONFIG_POR_PAIS, DOLAR_RATE_FALLBACK, TRAMOS_IMPUESTO_PERU } from '@/lib/config'
 import { CountryConfig, Pais } from '@/lib/types'
 
 // Umbrales de staleness en días
@@ -10,6 +10,7 @@ const STALE_THRESHOLDS = {
   uf: 2,
   afp: 45,
   tasas: 60,
+  dolar: 1,
 } as const
 
 function isStale(updatedAt: string | null | undefined, thresholdDays: number): boolean {
@@ -28,6 +29,7 @@ function getFallback(pais: Pais): CountryConfig {
   return {
     afpData,
     ufValue: (baseTasas.UF_VALUE as number) || 1,
+    dolarRate: DOLAR_RATE_FALLBACK[pais] ?? 1,
     bonosAnualesUF: pais === 'chile' ? BONOS_ANUALES_UF_DEFAULT : undefined,
     tasas: {
       // Remuneración Mínima y Base
@@ -82,7 +84,7 @@ async function fetchCountryConfig(pais: Pais): Promise<CountryConfig> {
   try {
     const { data, error } = await supabase
       .from('country_config')
-      .select('afp_data, afp_updated_at, uf_value, uf_updated_at, tasas, tasas_updated_at, bonos_anuales_uf')
+      .select('afp_data, afp_updated_at, uf_value, uf_updated_at, tasas, tasas_updated_at, bonos_anuales_uf, dolar_value, dolar_updated_at')
       .eq('pais', pais)
       .single()
       // Nota: el cliente Supabase no expone `next.revalidate` directamente.
@@ -120,7 +122,11 @@ async function fetchCountryConfig(pais: Pais): Promise<CountryConfig> {
     ? (row.bonos_anuales_uf as CountryConfig['bonosAnualesUF'])
     : fallback.bonosAnualesUF
 
-  return { afpData, ufValue, bonosAnualesUF, tasas }
+  const dolarRate = isStale(row.dolar_updated_at as string, STALE_THRESHOLDS.dolar)
+    ? (console.warn(`[config] dolar_value stale or null for pais=${pais}, using fallback`), fallback.dolarRate)
+    : (row.dolar_value as number)
+
+  return { afpData, ufValue, dolarRate, bonosAnualesUF, tasas }
 }
 
 // Exportar envuelto en unstable_cache para revalidar cada 1 hora
