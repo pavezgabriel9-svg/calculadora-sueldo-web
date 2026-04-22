@@ -56,7 +56,7 @@ function simularLiquido(
   // A. Gratificación
   const gratificacion = Math.min(
     sueldoBase * 0.25,
-    (tasas.GRATIFICACION_MAX_UF * tasas.SUELDO_MINIMO) / 12
+    (tasas.GRATIFICACION_MAX_IMM * tasas.SUELDO_MINIMO) / 12
   )
 
   // B. Total imponible antes de topes

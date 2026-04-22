@@ -31,7 +31,7 @@ export const FALLBACK_CONFIG: Record<string, CountryConfig> = {
       TASA_CESANTIA:            0.006,
       TOPE_AFP_SALUD_UF:        89.9,
       TOPE_CESANTIA_UF:         135.1,
-      GRATIFICACION_MAX_UF:     4.75,
+      GRATIFICACION_MAX_IMM:     4.75,
       SUELDO_MINIMO:            539000,
       CESANTIA_EMPLEADOR:       0.024,
       MUTUAL:                   0.0093,
@@ -48,7 +48,7 @@ export const FALLBACK_CONFIG: Record<string, CountryConfig> = {
     taxBrackets: [],
     tasas: {
       TASA_SALUD_FONASA: 0, TASA_CESANTIA: 0, TOPE_AFP_SALUD_UF: 0,
-      TOPE_CESANTIA_UF: 0, GRATIFICACION_MAX_UF: 0, SUELDO_MINIMO: 0,
+      TOPE_CESANTIA_UF: 0, GRATIFICACION_MAX_IMM: 0, SUELDO_MINIMO: 0,
       CESANTIA_EMPLEADOR: 0, MUTUAL: 0, SIS: 0, EXPECTATIVA_VIDA: 0,
       AFP_EMPLEADOR: 0, SEGURO_COMPLEMENTARIO_UF: 0,
     },
@@ -60,7 +60,7 @@ export const FALLBACK_CONFIG: Record<string, CountryConfig> = {
     taxBrackets: [],
     tasas: {
       TASA_SALUD_FONASA: 0, TASA_CESANTIA: 0, TOPE_AFP_SALUD_UF: 0,
-      TOPE_CESANTIA_UF: 0, GRATIFICACION_MAX_UF: 0, SUELDO_MINIMO: 0,
+      TOPE_CESANTIA_UF: 0, GRATIFICACION_MAX_IMM: 0, SUELDO_MINIMO: 0,
       CESANTIA_EMPLEADOR: 0, MUTUAL: 0, SIS: 0, EXPECTATIVA_VIDA: 0,
       AFP_EMPLEADOR: 0, SEGURO_COMPLEMENTARIO_UF: 0,
     },

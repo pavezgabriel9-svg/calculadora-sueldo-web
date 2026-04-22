@@ -59,7 +59,7 @@ export interface CountryConfig {
     TASA_CESANTIA: number
     TOPE_AFP_SALUD_UF: number
     TOPE_CESANTIA_UF: number
-    GRATIFICACION_MAX_UF: number
+    GRATIFICACION_MAX_IMM: number
     SUELDO_MINIMO: number
     CESANTIA_EMPLEADOR: number
     MUTUAL: number
