@@ -53,26 +53,56 @@ export type Modo = "liquido_a_base" | "base_a_liquido"
 export type Pais = "chile" | "peru" | "brasil"
 export type SistemaSalud = "fonasa" | "isapre"
 
+export interface TramoImpuesto {
+  desde_uf?: number
+  hasta_uf?: number | null
+  tasa: number
+}
+
 export interface CountryConfig {
   afpData: Record<string, number>
   ufValue: number
-  bonosAnualesUF: {
+  bonosAnualesUF?: {
     navidad: number
     fiestaPatrias: number
     escolaridad: number
   }
   tasas: {
-    TASA_SALUD_FONASA: number
-    TASA_CESANTIA: number
-    LIMITE_UF_IMPONIBLE: number
-    GRATIFICACION_MAX_IMM: number
+    // Remuneración Mínima y Base
+    RMV?: number
     SUELDO_MINIMO: number
-    LIMITE_IMPUESTO: number
-    TASA_IMPUESTO: number
+    SUELDOS_ANUALES?: number
+
+    // Sistema de Salud
+    TASA_SALUD_FONASA: number
+    TASA_SALUD_PATRONAL?: number
+    SALUD_BASE_MINIMA?: boolean
+
+    // Sistema Previsional
+    TASA_AFP_OBLIGATORIA?: number
+    TASA_SEGUROS_INVALIDEZ?: number
+    TASA_COMISION_AFP?: number
+
+    // Cesantía
+    TASA_CESANTIA: number
     CESANTIA_EMPLEADOR: number
+
+    // Costos Patronales
     MUTUAL: number
     SIS: number
     EXPECTATIVA_VIDA: number
+
+    // Gratificación/Bonos
+    GRATIFICACION_MAX_IMM: number
+    LIMITE_UF_IMPONIBLE: number
+
+    // Impuesto a la Renta
+    LIMITE_IMPUESTO: number
+    TASA_IMPUESTO: number
+    TRAMOS_IMPUESTO?: TramoImpuesto[]
+    UIT?: number
+    DEDUCCION_FIJA_UIT?: number
+    DEDUCCION_ADICIONAL_UIT?: number
   }
 }
 

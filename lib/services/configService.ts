@@ -2,7 +2,7 @@
 
 import { unstable_cache } from 'next/cache'
 import { supabase } from '@/lib/supabase'
-import { AFP_DATA, BONOS_ANUALES_UF_DEFAULT, CONFIG_POR_PAIS } from '@/lib/config'
+import { AFP_DATA, AFP_PERU_DATA, BONOS_ANUALES_UF_DEFAULT, CONFIG_POR_PAIS, TRAMOS_IMPUESTO_PERU } from '@/lib/config'
 import { CountryConfig, Pais } from '@/lib/types'
 
 // Umbrales de staleness en días
@@ -19,23 +19,52 @@ function isStale(updatedAt: string | null | undefined, thresholdDays: number): b
 }
 
 function getFallback(pais: Pais): CountryConfig {
-  const tasas = CONFIG_POR_PAIS[pais]
+  const baseTasas = CONFIG_POR_PAIS[pais] as Record<string, unknown>
+  const afpData =
+    pais === 'chile' ? AFP_DATA :
+    pais === 'peru' ? AFP_PERU_DATA :
+    {}
+
   return {
-    afpData: pais === 'chile' ? AFP_DATA : {},
-    ufValue: tasas.UF_VALUE,
-    bonosAnualesUF: BONOS_ANUALES_UF_DEFAULT,
+    afpData,
+    ufValue: (baseTasas.UF_VALUE as number) || 1,
+    bonosAnualesUF: pais === 'chile' ? BONOS_ANUALES_UF_DEFAULT : undefined,
     tasas: {
-      TASA_SALUD_FONASA: tasas.TASA_SALUD_FONASA,
-      TASA_CESANTIA: tasas.TASA_CESANTIA,
-      LIMITE_UF_IMPONIBLE: tasas.LIMITE_UF_IMPONIBLE,
-      GRATIFICACION_MAX_IMM: tasas.GRATIFICACION_MAX_IMM,
-      SUELDO_MINIMO: tasas.SUELDO_MINIMO,
-      LIMITE_IMPUESTO: tasas.LIMITE_IMPUESTO,
-      TASA_IMPUESTO: tasas.TASA_IMPUESTO,
-      CESANTIA_EMPLEADOR: tasas.CESANTIA_EMPLEADOR,
-      MUTUAL: tasas.MUTUAL,
-      SIS: tasas.SIS,
-      EXPECTATIVA_VIDA: tasas.EXPECTATIVA_VIDA,
+      // Remuneración Mínima y Base
+      RMV: baseTasas.RMV as number | undefined,
+      SUELDO_MINIMO: baseTasas.SUELDO_MINIMO as number,
+      SUELDOS_ANUALES: baseTasas.SUELDOS_ANUALES as number | undefined,
+
+      // Sistema de Salud
+      TASA_SALUD_FONASA: baseTasas.TASA_SALUD_FONASA as number,
+      TASA_SALUD_PATRONAL: baseTasas.TASA_SALUD_PATRONAL as number | undefined,
+      SALUD_BASE_MINIMA: baseTasas.SALUD_BASE_MINIMA as boolean | undefined,
+
+      // Sistema Previsional
+      TASA_AFP_OBLIGATORIA: baseTasas.TASA_AFP_OBLIGATORIA as number | undefined,
+      TASA_SEGUROS_INVALIDEZ: baseTasas.TASA_SEGUROS_INVALIDEZ as number | undefined,
+      TASA_COMISION_AFP: baseTasas.TASA_COMISION_AFP as number | undefined,
+
+      // Cesantía
+      TASA_CESANTIA: baseTasas.TASA_CESANTIA as number,
+      CESANTIA_EMPLEADOR: baseTasas.CESANTIA_EMPLEADOR as number,
+
+      // Costos Patronales
+      MUTUAL: baseTasas.MUTUAL as number,
+      SIS: baseTasas.SIS as number,
+      EXPECTATIVA_VIDA: baseTasas.EXPECTATIVA_VIDA as number,
+
+      // Gratificación/Bonos
+      GRATIFICACION_MAX_IMM: baseTasas.GRATIFICACION_MAX_IMM as number,
+      LIMITE_UF_IMPONIBLE: baseTasas.LIMITE_UF_IMPONIBLE as number,
+
+      // Impuesto a la Renta
+      LIMITE_IMPUESTO: baseTasas.LIMITE_IMPUESTO as number,
+      TASA_IMPUESTO: baseTasas.TASA_IMPUESTO as number,
+      TRAMOS_IMPUESTO: pais === 'peru' ? TRAMOS_IMPUESTO_PERU : undefined,
+      UIT: baseTasas.UIT as number | undefined,
+      DEDUCCION_FIJA_UIT: baseTasas.DEDUCCION_FIJA_UIT as number | undefined,
+      DEDUCCION_ADICIONAL_UIT: baseTasas.DEDUCCION_ADICIONAL_UIT as number | undefined,
     },
   }
 }
