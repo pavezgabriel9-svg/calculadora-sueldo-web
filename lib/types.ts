@@ -1,5 +1,12 @@
 // lib/types.ts
 
+export interface TramosImpuesto {
+  desde: number
+  hasta: number
+  tasa: number
+  rebaja: number
+}
+
 export interface Bono {
   id: string
   nombre: string
@@ -7,11 +14,10 @@ export interface Bono {
   imponible: boolean
 }
 
-export interface TramosImpuesto {
-  desde: number
-  hasta: number
-  tasa: number
-  rebaja: number
+export interface BonoAnual {
+  montoImponible: number
+  descuentoTrabajador: number
+  costoEmpresa: number
 }
 
 export interface ResultadosCalculo {
@@ -40,8 +46,14 @@ export interface ResultadosCalculo {
   seguroComplementario: number
   totalPatronal: number
 
-  // Total
+  // Total mensual
   costoTotalEmpresa: number
+
+  // Bonos anuales fijos
+  bonoNavidad: BonoAnual
+  bonoFiestasPatrias: BonoAnual
+  bonoEscolaridad: BonoAnual
+  costoTotalEmpresaAnual: number
 }
 
 export type Modo = "liquido_a_base" | "base_a_liquido"
@@ -52,8 +64,12 @@ export type Moneda = 'CLP' | 'USD'
 export interface CountryConfig {
   afpData: Record<string, number>
   ufValue: number
-  dolarValue: number
   taxBrackets: TramosImpuesto[]
+  bonosAnualesUF: {
+    navidad: number
+    fiestaPatrias: number
+    escolaridad: number
+  }
   tasas: {
     TASA_SALUD_FONASA: number
     TASA_CESANTIA: number
