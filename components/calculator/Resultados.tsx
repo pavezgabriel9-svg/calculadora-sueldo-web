@@ -47,6 +47,7 @@ export function Resultados({
       : "CÁLCULO: LÍQUIDO → BASE"
 
   const { bonoNavidad, bonoFiestasPatrias, bonoEscolaridad } = resultados
+  const dolarFormateado = formatCLP(dolarValue)
 
   return (
     <Card className="sticky top-4">
@@ -290,12 +291,12 @@ function ResultRow({
   label,
   value,
   variant = "normal",
-  format,
+  format = formatCLP,
 }: {
   label: string
   value: number
   variant?: "normal" | "entrada" | "principal" | "total" | "total-header" | "descuento"
-  format: (v: number) => string
+  format?: (v: number) => string
 }) {
   const valueClasses = {
     normal: "text-foreground",

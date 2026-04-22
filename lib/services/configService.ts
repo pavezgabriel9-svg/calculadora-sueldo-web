@@ -7,6 +7,7 @@ import { CountryConfig, Pais, TramosImpuesto } from '@/lib/types'
 
 const STALE_THRESHOLDS = {
   uf:          2,
+  dolar:       2,
   afp:         45,
   tasas:       60,
   taxBrackets: 30,
@@ -23,6 +24,7 @@ function getFallback(pais: Pais): CountryConfig {
   return {
     afpData: pais === 'chile' ? AFP_DATA : {},
     ufValue: t.UF_VALUE,
+    dolarValue: t.DOLAR_VALUE,
     taxBrackets: pais === 'chile' ? TAX_BRACKETS_CHILE : [],
     bonosAnualesUF: BONOS_ANUALES_UF_DEFAULT,
     tasas: {
@@ -43,7 +45,7 @@ function getFallback(pais: Pais): CountryConfig {
 }
 
 async function fetchCountryConfig(pais: Pais): Promise<CountryConfig> {
-  const fallback = FALLBACK_CONFIG[pais]
+  const fallback = getFallback(pais)
 
   if (!supabase) {
     console.warn(`[config] supabase client not initialized, using full fallback for pais=${pais}`)
@@ -55,7 +57,7 @@ async function fetchCountryConfig(pais: Pais): Promise<CountryConfig> {
   try {
     const { data, error } = await supabase
       .from('country_config')
-      .select('afp_data, afp_updated_at, uf_value, uf_updated_at, tasas, tasas_updated_at, tax_brackets, tax_brackets_updated_at, bonos_anuales_uf')
+      .select('afp_data, afp_updated_at, uf_value, uf_updated_at, dolar_value, dolar_updated_at, tasas, tasas_updated_at, tax_brackets, tax_brackets_updated_at, bonos_anuales_uf')
       .eq('pais', pais)
       .single()
 
@@ -99,7 +101,7 @@ async function fetchCountryConfig(pais: Pais): Promise<CountryConfig> {
     ? (row.bonos_anuales_uf as CountryConfig['bonosAnualesUF'])
     : fallback.bonosAnualesUF
 
-  return { afpData, ufValue, taxBrackets, bonosAnualesUF, tasas }
+  return { afpData, ufValue, dolarValue, taxBrackets, bonosAnualesUF, tasas }
 }
 
 export const getCountryConfig = unstable_cache(

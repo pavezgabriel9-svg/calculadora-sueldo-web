@@ -64,6 +64,7 @@ export type Moneda = 'CLP' | 'USD'
 export interface CountryConfig {
   afpData: Record<string, number>
   ufValue: number
+  dolarValue: number
   taxBrackets: TramosImpuesto[]
   bonosAnualesUF: {
     navidad: number

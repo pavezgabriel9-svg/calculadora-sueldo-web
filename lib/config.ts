@@ -1,6 +1,4 @@
 // lib/config.ts — solo fallback offline
-import { CountryConfig, Pais } from './types'
-
 import { Pais, TramosImpuesto } from "./types"
 
 export const PAISES: Pais[] = ["chile", "peru", "brasil"]
@@ -19,6 +17,7 @@ export const AFP_DATA: Record<string, number> = {
 // Tasas y parámetros Chile
 export const TASAS_CHILE = {
   UF_VALUE: 38000,
+  DOLAR_VALUE: 950,
   TASA_SALUD_FONASA: 0.07,
   TASA_CESANTIA: 0.006,
   TOPE_AFP_SALUD_UF: 89.9,
@@ -36,6 +35,7 @@ export const TASAS_CHILE = {
 // Tasas y parámetros Perú (placeholder para Fase 2)
 export const TASAS_PERU = {
   UF_VALUE: 1,
+  DOLAR_VALUE: 1,
   TASA_SALUD_FONASA: 0,
   TASA_CESANTIA: 0,
   TOPE_AFP_SALUD_UF: 0,
@@ -53,6 +53,7 @@ export const TASAS_PERU = {
 // Tasas y parámetros Brasil (placeholder para Fase 2)
 export const TASAS_BRASIL = {
   UF_VALUE: 1,
+  DOLAR_VALUE: 1,
   TASA_SALUD_FONASA: 0,
   TASA_CESANTIA: 0,
   TOPE_AFP_SALUD_UF: 0,
