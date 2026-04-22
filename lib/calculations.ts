@@ -1,6 +1,13 @@
 // lib/calculations.ts
 
-import { Bono, BonoAnual, ResultadosCalculo, Modo, Pais, SistemaSalud, CountryConfig } from "./types"
+import { Bono, BonoAnual, ResultadosCalculo, Modo, Pais, SistemaSalud, CountryConfig, TramosImpuesto } from "./types"
+
+function calcularImpuesto(baseTributable: number, tramos: TramosImpuesto[]): number {
+  if (baseTributable <= 0 || tramos.length === 0) return 0
+  const tramo = tramos.find(t => baseTributable >= t.desde && baseTributable <= t.hasta)
+  if (!tramo || tramo.tasa === 0) return 0
+  return Math.max(0, baseTributable * tramo.tasa - tramo.rebaja)
+}
 
 function calcularBonoAnual(
   ufAmount: number,
@@ -46,7 +53,7 @@ function simular(
   bonosNoImponibles: number,
   config: CountryConfig
 ): DetallesSim {
-  const { afpData, ufValue, tasas } = config
+  const { afpData, ufValue, tasas, taxBrackets } = config
   const tasaAFP = afpData[afpNombre] || 0.1049
 
   // Topes diferenciados desde Supabase (AFP/Salud vs Cesantía)
@@ -70,9 +77,7 @@ function simular(
 
   // Base tributable: imponible completo menos descuentos previsionales
   const baseTributable = imponible - descuentoAFP - descuentoSalud - descuentoCesantia
-  const impuesto = baseTributable > tasas.LIMITE_IMPUESTO
-    ? (baseTributable - tasas.LIMITE_IMPUESTO) * tasas.TASA_IMPUESTO
-    : 0
+  const impuesto = calcularImpuesto(baseTributable, taxBrackets)
 
   const totalDescuentos = descuentoAFP + descuentoSalud + descuentoCesantia + impuesto
   const totalHaberes = imponible + movilizacion + bonosNoImponibles

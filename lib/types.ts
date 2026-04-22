@@ -1,5 +1,12 @@
 // lib/types.ts
 
+export interface TramosImpuesto {
+  desde: number
+  hasta: number
+  tasa: number
+  rebaja: number
+}
+
 export interface Bono {
   id: string
   nombre: string
@@ -56,6 +63,7 @@ export type SistemaSalud = "fonasa" | "isapre"
 export interface CountryConfig {
   afpData: Record<string, number>
   ufValue: number
+  taxBrackets: TramosImpuesto[]
   bonosAnualesUF: {
     navidad: number
     fiestaPatrias: number
@@ -68,8 +76,6 @@ export interface CountryConfig {
     TOPE_CESANTIA_UF: number
     GRATIFICACION_MAX_IMM: number
     SUELDO_MINIMO: number
-    LIMITE_IMPUESTO: number
-    TASA_IMPUESTO: number
     CESANTIA_EMPLEADOR: number
     MUTUAL: number
     SIS: number

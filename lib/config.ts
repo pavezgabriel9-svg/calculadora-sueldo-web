@@ -1,6 +1,6 @@
 // lib/config.ts
 
-import { Pais } from "./types"
+import { Pais, TramosImpuesto } from "./types"
 
 export const PAISES: Pais[] = ["chile", "peru", "brasil"]
 
@@ -24,8 +24,6 @@ export const TASAS_CHILE = {
   TOPE_CESANTIA_UF: 135.1,
   GRATIFICACION_MAX_IMM: 4.75,
   SUELDO_MINIMO: 539000,
-  LIMITE_IMPUESTO: 800000,
-  TASA_IMPUESTO: 0.04,
   CESANTIA_EMPLEADOR: 0.024,
   MUTUAL: 0.0093,
   SIS: 0.0154,
@@ -43,8 +41,6 @@ export const TASAS_PERU = {
   TOPE_CESANTIA_UF: 0,
   GRATIFICACION_MAX_IMM: 0,
   SUELDO_MINIMO: 0,
-  LIMITE_IMPUESTO: 0,
-  TASA_IMPUESTO: 0,
   CESANTIA_EMPLEADOR: 0,
   MUTUAL: 0,
   SIS: 0,
@@ -62,8 +58,6 @@ export const TASAS_BRASIL = {
   TOPE_CESANTIA_UF: 0,
   GRATIFICACION_MAX_IMM: 0,
   SUELDO_MINIMO: 0,
-  LIMITE_IMPUESTO: 0,
-  TASA_IMPUESTO: 0,
   CESANTIA_EMPLEADOR: 0,
   MUTUAL: 0,
   SIS: 0,
@@ -78,10 +72,20 @@ export const CONFIG_POR_PAIS = {
   brasil: TASAS_BRASIL,
 }
 
+// Tramos de impuesto de segunda categoría (fallback offline — valores desde data.py)
+export const TAX_BRACKETS_CHILE: TramosImpuesto[] = [
+  { desde: 0,            hasta: 938817,     tasa: 0.00,  rebaja: 0          },
+  { desde: 938817.01,    hasta: 2086260,    tasa: 0.04,  rebaja: 37552.68   },
+  { desde: 2086260.01,   hasta: 3477100,    tasa: 0.08,  rebaja: 121003.08  },
+  { desde: 3477100.01,   hasta: 4867940,    tasa: 0.135, rebaja: 312243.58  },
+  { desde: 4867940.01,   hasta: 6258780,    tasa: 0.23,  rebaja: 774697.88  },
+  { desde: 6258780.01,   hasta: 8345040,    tasa: 0.304, rebaja: 1237847.60 },
+  { desde: 8345040.01,   hasta: 21558020,   tasa: 0.35,  rebaja: 1621719.44 },
+  { desde: 21558020.01,  hasta: 999999999,  tasa: 0.40,  rebaja: 2699620.44 },
+]
+
 export const BONOS_ANUALES_UF_DEFAULT = {
   navidad: 7,
   fiestaPatrias: 6,
   escolaridad: 3,
 }
-
-export type CountryConfig = typeof TASAS_CHILE
