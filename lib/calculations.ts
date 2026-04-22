@@ -124,6 +124,7 @@ export function calcularRemuneracion(
       if (Math.abs(diferencia) < 100) break
       sueldoBase = Math.round(sueldoBase + diferencia * 0.8)
     }
+  }
 
   const d = sim(sueldoBase)
 
