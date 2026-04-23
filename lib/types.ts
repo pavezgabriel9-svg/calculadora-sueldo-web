@@ -20,6 +20,13 @@ export interface BonoAnual {
   costoEmpresa: number
 }
 
+export interface BonoEmpresaTipo {
+  id: string
+  nombre: string
+  montoFijo?: number
+  tasa?: number
+}
+
 export interface ResultadosCalculo {
   sueldoBase: number
   sueldoLiquido: number
@@ -28,6 +35,7 @@ export interface ResultadosCalculo {
   bonosNoImponibles: number
   totalHaberesImponibles: number
   movilizacion: number
+  bonoEmpresaAnual: BonoAnual
   totalHaberes: number
 
   // Descuentos trabajador
@@ -71,6 +79,7 @@ export interface CountryConfig {
     fiestaPatrias: number
     escolaridad: number
   }
+  bonosEmpresa: BonoEmpresaTipo[]
   tasas: {
     TASA_SALUD_FONASA: number
     TASA_CESANTIA: number
@@ -94,6 +103,8 @@ export interface CalculatorParams {
   sistemaSalud: SistemaSalud
   saludUF: string
   movilizacion: string
+  bonoEmpresaTipo: string
+  bonoEmpresaMonto: string
   bonos: Bono[]
   pais: Pais
   config: CountryConfig

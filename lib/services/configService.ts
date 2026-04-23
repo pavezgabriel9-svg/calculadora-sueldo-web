@@ -2,8 +2,8 @@
 
 import { unstable_cache } from 'next/cache'
 import { supabase } from '@/lib/supabase'
-import { AFP_DATA, BONOS_ANUALES_UF_DEFAULT, CONFIG_POR_PAIS, TAX_BRACKETS_CHILE } from '@/lib/config'
-import { CountryConfig, Pais, TramosImpuesto } from '@/lib/types'
+import { AFP_DATA, BONOS_ANUALES_UF_DEFAULT, BONOS_EMPRESA_DEFAULT, CONFIG_POR_PAIS, TAX_BRACKETS_CHILE } from '@/lib/config'
+import { BonoEmpresaTipo, CountryConfig, Pais, TramosImpuesto } from '@/lib/types'
 
 const STALE_THRESHOLDS = {
   uf:          2,
@@ -27,6 +27,7 @@ function getFallback(pais: Pais): CountryConfig {
     dolarValue: t.DOLAR_VALUE,
     taxBrackets: pais === 'chile' ? TAX_BRACKETS_CHILE : [],
     bonosAnualesUF: BONOS_ANUALES_UF_DEFAULT,
+    bonosEmpresa: BONOS_EMPRESA_DEFAULT,
     tasas: {
       TASA_SALUD_FONASA:        t.TASA_SALUD_FONASA,
       TASA_CESANTIA:            t.TASA_CESANTIA,
@@ -57,7 +58,7 @@ async function fetchCountryConfig(pais: Pais): Promise<CountryConfig> {
   try {
     const { data, error } = await supabase
       .from('country_config')
-      .select('afp_data, afp_updated_at, uf_value, uf_updated_at, dolar_value, dolar_updated_at, tasas, tasas_updated_at, tax_brackets, tax_brackets_updated_at, bonos_anuales_uf')
+      .select('afp_data, afp_updated_at, uf_value, uf_updated_at, dolar_value, dolar_updated_at, tasas, tasas_updated_at, tax_brackets, tax_brackets_updated_at, bonos_anuales_uf, bonos_empresa')
       .eq('pais', pais)
       .single()
 
@@ -101,7 +102,11 @@ async function fetchCountryConfig(pais: Pais): Promise<CountryConfig> {
     ? (row.bonos_anuales_uf as CountryConfig['bonosAnualesUF'])
     : fallback.bonosAnualesUF
 
-  return { afpData, ufValue, dolarValue, taxBrackets, bonosAnualesUF, tasas }
+  const bonosEmpresa = row.bonos_empresa
+    ? (row.bonos_empresa as BonoEmpresaTipo[])
+    : fallback.bonosEmpresa
+
+  return { afpData, ufValue, dolarValue, taxBrackets, bonosAnualesUF, bonosEmpresa, tasas }
 }
 
 export const getCountryConfig = unstable_cache(

@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { formatCLP, formatNumericInput } from "@/lib/utils"
-import { Modo, SistemaSalud } from "@/lib/types"
+import { BonoEmpresaTipo, Modo, SistemaSalud } from "@/lib/types"
 
 export function DatosPrincipales({
   modo,
@@ -28,6 +28,12 @@ export function DatosPrincipales({
   onSaludUFChange,
   movilizacion,
   onMovilizacionChange,
+  bonoEmpresaTipo,
+  onBonoEmpresaTipoChange,
+  bonoEmpresaMonto,
+  onBonoEmpresaMontoChange,
+  bonoEmpresaComputado,
+  bonosEmpresa,
   afpData,
 }: {
   modo: Modo
@@ -41,9 +47,17 @@ export function DatosPrincipales({
   onSaludUFChange: (v: string) => void
   movilizacion: string
   onMovilizacionChange: (v: string) => void
+  bonoEmpresaTipo: string
+  onBonoEmpresaTipoChange: (v: string) => void
+  bonoEmpresaMonto: string
+  onBonoEmpresaMontoChange: (v: string) => void
+  bonoEmpresaComputado: number
+  bonosEmpresa: BonoEmpresaTipo[]
   afpData: Record<string, number>
 }) {
   const tasaAFP = afpData[afp] || 0.1049
+  const tipoObj = bonosEmpresa.find(b => b.id === bonoEmpresaTipo)
+  const esMontoFijo = !tipoObj?.tasa
 
   return (
     <Card>
@@ -145,6 +159,46 @@ export function DatosPrincipales({
             placeholder="Ej: 40.000"
             className="h-11"
           />
+        </div>
+
+        {/* Bono Empresa */}
+        <div className="space-y-2">
+          <Label className="text-sm font-semibold">Bono Empresa</Label>
+          <div className="flex gap-3">
+            <Select value={bonoEmpresaTipo} onValueChange={onBonoEmpresaTipoChange}>
+              <SelectTrigger className="flex-1 h-11">
+                <SelectValue placeholder="Tipo de bono" />
+              </SelectTrigger>
+              <SelectContent>
+                {bonosEmpresa.map((b) => (
+                  <SelectItem key={b.id} value={b.id}>
+                    {b.nombre}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {tipoObj?.tasa && (
+              <Badge variant="secondary" className="h-11 px-3 flex items-center text-sm shrink-0">
+                {(tipoObj.tasa * 100).toFixed(1)}%
+              </Badge>
+            )}
+          </div>
+          {esMontoFijo ? (
+            <Input
+              type="text"
+              value={bonoEmpresaMonto}
+              onChange={(e) =>
+                onBonoEmpresaMontoChange(formatNumericInput(e.target.value))
+              }
+              placeholder="Ej: 600.000"
+              className="h-11"
+            />
+          ) : (
+            <div className="h-11 flex items-center px-3 rounded-md border bg-muted/50 text-sm text-muted-foreground">
+              {formatCLP(bonoEmpresaComputado)}
+              <span className="ml-2 text-xs opacity-70">(calculado sobre sueldo base)</span>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

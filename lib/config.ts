@@ -1,5 +1,5 @@
 // lib/config.ts — solo fallback offline
-import { Pais, TramosImpuesto } from "./types"
+import { BonoEmpresaTipo, Pais, TramosImpuesto } from "./types"
 
 export const PAISES: Pais[] = ["chile", "peru", "brasil"]
 
@@ -91,3 +91,11 @@ export const BONOS_ANUALES_UF_DEFAULT = {
   fiestaPatrias: 6,
   escolaridad: 3,
 }
+
+export const BONOS_EMPRESA_DEFAULT: BonoEmpresaTipo[] = [
+  { id: 'empresa',      nombre: 'Empresa',        montoFijo: 600000 },
+  { id: 'partnership',  nombre: 'Partnership',     tasa: 0.012 },
+  { id: 'jefe_area',    nombre: 'Jefe de Área',    tasa: 0.01 },
+  { id: 'jefe_unidad',  nombre: 'Jefe de Unidad',  tasa: 0.005 },
+  { id: 'subgerente',   nombre: 'Subgerente',       tasa: 0.015 },
+]

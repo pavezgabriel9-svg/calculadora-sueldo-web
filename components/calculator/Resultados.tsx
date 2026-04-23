@@ -49,7 +49,7 @@ export function Resultados({
       ? "CÁLCULO: BASE → LÍQUIDO"
       : "CÁLCULO: LÍQUIDO → BASE"
 
-  const { bonoNavidad, bonoFiestasPatrias, bonoEscolaridad } = resultados
+  const { bonoNavidad, bonoFiestasPatrias, bonoEscolaridad, bonoEmpresaAnual } = resultados
 
   return (
     <Card className="sticky top-4">
@@ -188,6 +188,9 @@ export function Resultados({
           <BonoAnualRow label="Bono Navidad" uf={7} bono={bonoNavidad} format={fmt} />
           <BonoAnualRow label="Bono Fiestas Patrias" uf={6} bono={bonoFiestasPatrias} format={fmt} />
           <BonoAnualRow label="Bono Escolaridad" uf={3} bono={bonoEscolaridad} format={fmt} />
+          {bonoEmpresaAnual.montoImponible > 0 && (
+            <BonoAnualRow label="Bono Empresa" bono={bonoEmpresaAnual} format={fmt} />
+          )}
         </AccordionSection>
 
       </CardContent>
@@ -264,7 +267,7 @@ function BonoAnualRow({
   format,
 }: {
   label: string
-  uf: number
+  uf?: number
   bono: { montoImponible: number; costoEmpresa: number }
   format: Formatter
 }) {
@@ -272,7 +275,7 @@ function BonoAnualRow({
     <div className="py-0.5">
       <div className="flex items-center justify-between">
         <span className="text-xs text-muted-foreground">
-          {label} <span className="text-violet-500 font-medium">({uf} UF)</span>
+          {label}{uf !== undefined && <span className="text-violet-500 font-medium"> ({uf} UF)</span>}
         </span>
         <span className="text-xs text-muted-foreground">{format(bono.montoImponible)}</span>
       </div>

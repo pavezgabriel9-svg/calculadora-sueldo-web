@@ -15,7 +15,15 @@ function calcularBonoAnual(
   tasaAFP: number,
   tasas: CountryConfig['tasas']
 ): BonoAnual {
-  const montoImponible = Math.round(ufAmount * ufValue)
+  return calcularBonoAnualDesdeClp(Math.round(ufAmount * ufValue), tasaAFP, tasas)
+}
+
+function calcularBonoAnualDesdeClp(
+  montoClp: number,
+  tasaAFP: number,
+  tasas: CountryConfig['tasas']
+): BonoAnual {
+  const montoImponible = Math.round(montoClp)
   const descuentoTrabajador = Math.round(
     montoImponible * (tasaAFP + tasas.TASA_SALUD_FONASA + tasas.TASA_CESANTIA)
   )
@@ -39,6 +47,7 @@ interface DetallesSim {
   descuentoCesantia: number
   impuesto: number
   totalDescuentos: number
+  bonoEmpresa: number
   totalHaberes: number
   liquido: number
 }
@@ -51,6 +60,8 @@ function simular(
   movilizacion: number,
   bonosImponibles: number,
   bonosNoImponibles: number,
+  bonoEmpresaMonto: number,
+  bonoEmpresaTasa: number,
   config: CountryConfig
 ): DetallesSim {
   const { afpData, ufValue, tasas, taxBrackets } = config
@@ -80,13 +91,16 @@ function simular(
   const impuesto = calcularImpuesto(baseTributable, taxBrackets)
 
   const totalDescuentos = descuentoAFP + descuentoSalud + descuentoCesantia + impuesto
+  const bonoEmpresa = bonoEmpresaTasa > 0
+    ? Math.round(sueldoBase * bonoEmpresaTasa)
+    : bonoEmpresaMonto
   const totalHaberes = imponible + movilizacion + bonosNoImponibles
   const liquido = totalHaberes - totalDescuentos
 
   return {
     gratificacion, imponible, impAfectoAFPSalud, impAfectoCesantia,
     descuentoAFP, descuentoSalud, descuentoCesantia,
-    impuesto, totalDescuentos, totalHaberes, liquido,
+    impuesto, totalDescuentos, bonoEmpresa, totalHaberes, liquido,
   }
 }
 
@@ -97,6 +111,8 @@ export function calcularRemuneracion(
   sistemaSalud: SistemaSalud,
   saludUF: number,
   movilizacion: number,
+  bonoEmpresaMonto: number,
+  bonoEmpresaTasa: number,
   bonos: Bono[],
   _pais: Pais,
   config: CountryConfig
@@ -108,7 +124,7 @@ export function calcularRemuneracion(
   const bonosNoImponibles = bonos.filter(b => !b.imponible).reduce((s, b) => s + b.monto, 0)
 
   const sim = (base: number) =>
-    simular(base, afpNombre, sistemaSalud, saludUF, movilizacion, bonosImponibles, bonosNoImponibles, config)
+    simular(base, afpNombre, sistemaSalud, saludUF, movilizacion, bonosImponibles, bonosNoImponibles, bonoEmpresaMonto, bonoEmpresaTasa, config)
 
   let sueldoBase: number
 
@@ -139,15 +155,17 @@ export function calcularRemuneracion(
 
   const costoTotalEmpresa = d.totalHaberes + totalPatronal
 
-  const bonoNavidad       = calcularBonoAnual(config.bonosAnualesUF.navidad,       ufValue, tasaAFP, tasas)
+  const bonoNavidad        = calcularBonoAnual(config.bonosAnualesUF.navidad,       ufValue, tasaAFP, tasas)
   const bonoFiestasPatrias = calcularBonoAnual(config.bonosAnualesUF.fiestaPatrias, ufValue, tasaAFP, tasas)
-  const bonoEscolaridad   = calcularBonoAnual(config.bonosAnualesUF.escolaridad,   ufValue, tasaAFP, tasas)
+  const bonoEscolaridad    = calcularBonoAnual(config.bonosAnualesUF.escolaridad,   ufValue, tasaAFP, tasas)
+  const bonoEmpresaAnual   = calcularBonoAnualDesdeClp(d.bonoEmpresa, tasaAFP, tasas)
 
   const costoTotalEmpresaAnual =
     Math.round(costoTotalEmpresa) * 12 +
     bonoNavidad.costoEmpresa +
     bonoFiestasPatrias.costoEmpresa +
-    bonoEscolaridad.costoEmpresa
+    bonoEscolaridad.costoEmpresa +
+    bonoEmpresaAnual.costoEmpresa
 
   return {
     sueldoBase:             Math.round(sueldoBase),
@@ -157,6 +175,7 @@ export function calcularRemuneracion(
     bonosNoImponibles,
     totalHaberesImponibles: Math.round(d.imponible),
     movilizacion,
+    bonoEmpresaAnual,
     totalHaberes:           Math.round(d.totalHaberes),
     cotizacionPrevisional:  Math.round(d.descuentoAFP),
     cotizacionSalud:        Math.round(d.descuentoSalud),
