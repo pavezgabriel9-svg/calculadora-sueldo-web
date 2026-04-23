@@ -30,6 +30,8 @@ export function DatosPrincipales({
   onMovilizacionChange,
   bonoEmpresaTipo,
   onBonoEmpresaTipoChange,
+  bonoEmpresaTasaIdx,
+  onBonoEmpresaTasaIdxChange,
   bonoEmpresaMonto,
   onBonoEmpresaMontoChange,
   bonoEmpresaComputado,
@@ -49,6 +51,8 @@ export function DatosPrincipales({
   onMovilizacionChange: (v: string) => void
   bonoEmpresaTipo: string
   onBonoEmpresaTipoChange: (v: string) => void
+  bonoEmpresaTasaIdx: number
+  onBonoEmpresaTasaIdxChange: (idx: number) => void
   bonoEmpresaMonto: string
   onBonoEmpresaMontoChange: (v: string) => void
   bonoEmpresaComputado: number
@@ -57,7 +61,8 @@ export function DatosPrincipales({
 }) {
   const tasaAFP = afpData[afp] || 0.1049
   const tipoObj = bonosEmpresa.find(b => b.id === bonoEmpresaTipo)
-  const esMontoFijo = !tipoObj?.tasa
+  const tasaArr = tipoObj?.tasa
+  const esMontoFijo = !Array.isArray(tasaArr) || tasaArr.length === 0
 
   return (
     <Card>
@@ -164,25 +169,37 @@ export function DatosPrincipales({
         {/* Bono Empresa */}
         <div className="space-y-2">
           <Label className="text-sm font-semibold">Bono Empresa</Label>
-          <div className="flex gap-3">
-            <Select value={bonoEmpresaTipo} onValueChange={onBonoEmpresaTipoChange}>
-              <SelectTrigger className="flex-1 h-11">
-                <SelectValue placeholder="Tipo de bono" />
-              </SelectTrigger>
-              <SelectContent>
-                {bonosEmpresa.map((b) => (
-                  <SelectItem key={b.id} value={b.id}>
-                    {b.nombre}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {tipoObj?.tasa && (
-              <Badge variant="secondary" className="h-11 px-3 flex items-center text-sm shrink-0">
-                {(tipoObj.tasa * 100).toFixed(1)}%
-              </Badge>
-            )}
-          </div>
+          <Select value={bonoEmpresaTipo} onValueChange={onBonoEmpresaTipoChange}>
+            <SelectTrigger className="h-11">
+              <SelectValue placeholder="Tipo de bono" />
+            </SelectTrigger>
+            <SelectContent>
+              {bonosEmpresa.map((b) => (
+                <SelectItem key={b.id} value={b.id}>
+                  {b.nombre}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {Array.isArray(tasaArr) && tasaArr.length > 0 && (
+            <div className="flex gap-3">
+              <Select
+                value={String(bonoEmpresaTasaIdx)}
+                onValueChange={(v) => onBonoEmpresaTasaIdxChange(Number(v))}
+              >
+                <SelectTrigger className="flex-1 h-11">
+                  <SelectValue placeholder="Tasa" />
+                </SelectTrigger>
+                <SelectContent>
+                  {tasaArr.map((t, i) => (
+                    <SelectItem key={i} value={String(i)}>
+                      {(t * 100).toFixed(0)}%
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              </div>
+          )}
           {esMontoFijo ? (
             <Input
               type="text"

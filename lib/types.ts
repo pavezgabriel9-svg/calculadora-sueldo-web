@@ -24,7 +24,7 @@ export interface BonoEmpresaTipo {
   id: string
   nombre: string
   montoFijo?: number
-  tasa?: number
+  tasa?: number[]
 }
 
 export interface ResultadosCalculo {
@@ -104,6 +104,7 @@ export interface CalculatorParams {
   saludUF: string
   movilizacion: string
   bonoEmpresaTipo: string
+  bonoEmpresaTasaIdx: number
   bonoEmpresaMonto: string
   bonos: Bono[]
   pais: Pais

@@ -13,7 +13,10 @@ export function useCalculator(params: CalculatorParams): ResultadosCalculo {
     const montoMovilizacion = parseNumericInput(params.movilizacion)
 
     const tipoObj = params.config.bonosEmpresa.find(b => b.id === params.bonoEmpresaTipo)
-    const bonoEmpresaTasa = tipoObj?.tasa ?? 0
+    const tasaArr = tipoObj?.tasa
+    const bonoEmpresaTasa = Array.isArray(tasaArr)
+      ? (tasaArr[params.bonoEmpresaTasaIdx] ?? tasaArr[0] ?? 0)
+      : 0
     const bonoEmpresaMonto = bonoEmpresaTasa > 0
       ? 0
       : parseNumericInput(params.bonoEmpresaMonto)
@@ -55,6 +58,7 @@ export function useCalculator(params: CalculatorParams): ResultadosCalculo {
     params.saludUF,
     params.movilizacion,
     params.bonoEmpresaTipo,
+    params.bonoEmpresaTasaIdx,
     params.bonoEmpresaMonto,
     params.bonos,
     params.pais,

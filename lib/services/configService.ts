@@ -103,7 +103,12 @@ async function fetchCountryConfig(pais: Pais): Promise<CountryConfig> {
     : fallback.bonosAnualesUF
 
   const bonosEmpresa = row.bonos_empresa
-    ? (row.bonos_empresa as BonoEmpresaTipo[])
+    ? (row.bonos_empresa as BonoEmpresaTipo[]).map((b) => ({
+        ...b,
+        tasa: b.tasa !== undefined
+          ? (Array.isArray(b.tasa) ? b.tasa : [b.tasa as unknown as number])
+          : undefined,
+      }))
     : fallback.bonosEmpresa
 
   return { afpData, ufValue, dolarValue, taxBrackets, bonosAnualesUF, bonosEmpresa, tasas }
