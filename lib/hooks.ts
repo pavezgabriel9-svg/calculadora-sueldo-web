@@ -12,6 +12,12 @@ export function useCalculator(params: CalculatorParams): ResultadosCalculo {
     const montoSueldo = parseNumericInput(params.sueldo)
     const montoMovilizacion = parseNumericInput(params.movilizacion)
 
+    const tipoObj = params.config.bonosEmpresa.find(b => b.id === params.bonoEmpresaTipo)
+    const bonoEmpresaTasa = tipoObj?.tasa ?? 0
+    const bonoEmpresaMonto = bonoEmpresaTasa > 0
+      ? 0
+      : parseNumericInput(params.bonoEmpresaMonto)
+
     if (montoSueldo === 0) {
       return calcularRemuneracion(
         params.modo,
@@ -20,6 +26,8 @@ export function useCalculator(params: CalculatorParams): ResultadosCalculo {
         params.sistemaSalud,
         parseFloat(params.saludUF || "0"),
         montoMovilizacion,
+        bonoEmpresaMonto,
+        bonoEmpresaTasa,
         params.bonos,
         params.pais,
         params.config
@@ -33,6 +41,8 @@ export function useCalculator(params: CalculatorParams): ResultadosCalculo {
       params.sistemaSalud,
       parseFloat(params.saludUF || "0"),
       montoMovilizacion,
+      bonoEmpresaMonto,
+      bonoEmpresaTasa,
       params.bonos,
       params.pais,
       params.config
@@ -44,6 +54,8 @@ export function useCalculator(params: CalculatorParams): ResultadosCalculo {
     params.sistemaSalud,
     params.saludUF,
     params.movilizacion,
+    params.bonoEmpresaTipo,
+    params.bonoEmpresaMonto,
     params.bonos,
     params.pais,
     params.config,

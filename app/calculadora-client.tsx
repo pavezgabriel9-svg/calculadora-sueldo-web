@@ -24,6 +24,8 @@ export function CalculadoraClient({ config }: { config: CountryConfig }) {
   const [sistemaSalud, setSistemaSalud] = useState<SistemaSalud>("fonasa")
   const [saludUF, setSaludUF] = useState("")
   const [movilizacion, setMovilizacion] = useState("40.000")
+  const [bonoEmpresaTipo, setBonoEmpresaTipo] = useState("empresa")
+  const [bonoEmpresaMonto, setBonoEmpresaMonto] = useState("600.000")
   const [bonos, setBonos] = useState<Bono[]>([
     //{ id: "1", nombre: "Producción", monto: 100000, imponible: true },
   ])
@@ -36,6 +38,8 @@ export function CalculadoraClient({ config }: { config: CountryConfig }) {
     sistemaSalud,
     saludUF,
     movilizacion,
+    bonoEmpresaTipo,
+    bonoEmpresaMonto,
     bonos,
     pais,
     config,
@@ -75,6 +79,18 @@ export function CalculadoraClient({ config }: { config: CountryConfig }) {
               onSaludUFChange={setSaludUF}
               movilizacion={movilizacion}
               onMovilizacionChange={setMovilizacion}
+              bonoEmpresaTipo={bonoEmpresaTipo}
+              onBonoEmpresaTipoChange={(tipo) => {
+                setBonoEmpresaTipo(tipo)
+                const tipoObj = config.bonosEmpresa.find(b => b.id === tipo)
+                if (tipoObj?.montoFijo) {
+                  setBonoEmpresaMonto(tipoObj.montoFijo.toLocaleString('es-CL'))
+                }
+              }}
+              bonoEmpresaMonto={bonoEmpresaMonto}
+              onBonoEmpresaMontoChange={setBonoEmpresaMonto}
+              bonoEmpresaComputado={resultados.bonoEmpresaAnual.montoImponible}
+              bonosEmpresa={config.bonosEmpresa}
               afpData={config.afpData}
             />
 
