@@ -1,7 +1,5 @@
 'use client'
 
-// components/calculator/Resultados.tsx
-
 import { useState } from "react"
 import { ChevronDown, Shield, TrendingDown, TrendingUp, Calendar } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
@@ -9,6 +7,8 @@ import { Separator } from "@/components/ui/separator"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { formatCLP, formatUSD } from "@/lib/utils"
 import { ResultadosCalculo, Modo, Moneda } from "@/lib/types"
+
+type Formatter = (v: number) => string
 
 export function Resultados({
   modo,
@@ -36,6 +36,9 @@ export function Resultados({
 
   const isOpen = (section: string) => openSections.has(section)
 
+  const fmt: Formatter = (v) =>
+    moneda === 'USD' ? formatUSD(v / dolarValue) : formatCLP(v)
+
   const headerColor =
     modo === "base_a_liquido"
       ? "bg-gradient-to-r from-blue-600 to-blue-700"
@@ -47,7 +50,6 @@ export function Resultados({
       : "CÁLCULO: LÍQUIDO → BASE"
 
   const { bonoNavidad, bonoFiestasPatrias, bonoEscolaridad } = resultados
-  const dolarFormateado = formatCLP(dolarValue)
 
   return (
     <Card className="sticky top-4">
@@ -74,25 +76,25 @@ export function Resultados({
             </ToggleGroupItem>
           </ToggleGroup>
         </div>
-        <p className="text-xs text-white/60 mt-1">1 USD = {dolarFormateado}</p>
+        <p className="text-xs text-white/60 mt-1">1 USD = {formatCLP(dolarValue)}</p>
       </div>
 
       <CardContent className="p-4 space-y-1 max-h-[calc(100vh-200px)] overflow-y-auto">
 
         {/* Entrada */}
         {modo === "base_a_liquido" ? (
-          <ResultRow label="Sueldo Base (entrada)" value={resultados.sueldoBase} variant="entrada" />
+          <ResultRow label="Sueldo Base (entrada)" value={resultados.sueldoBase} variant="entrada" format={fmt} />
         ) : (
-          <ResultRow label="Líquido Objetivo (entrada)" value={resultados.sueldoLiquido} variant="entrada" />
+          <ResultRow label="Líquido Objetivo (entrada)" value={resultados.sueldoLiquido} variant="entrada" format={fmt} />
         )}
 
         <Separator className="my-2" />
 
         {/* Principal */}
         {modo === "base_a_liquido" ? (
-          <ResultRow label="SUELDO LÍQUIDO" value={resultados.sueldoLiquido} variant="principal" />
+          <ResultRow label="SUELDO LÍQUIDO" value={resultados.sueldoLiquido} variant="principal" format={fmt} />
         ) : (
-          <ResultRow label="SUELDO BASE" value={resultados.sueldoBase} variant="principal" />
+          <ResultRow label="SUELDO BASE" value={resultados.sueldoBase} variant="principal" format={fmt} />
         )}
 
         <Separator className="my-2" />
@@ -105,17 +107,18 @@ export function Resultados({
           variant="total"
           isOpen={isOpen("haberes")}
           onToggle={() => toggle("haberes")}
+          format={fmt}
         >
-          <ResultRow label="Sueldo Base" value={resultados.sueldoBase} />
-          <ResultRow label="Gratificación" value={resultados.gratificacion} />
+          <ResultRow label="Sueldo Base" value={resultados.sueldoBase} format={fmt} />
+          <ResultRow label="Gratificación" value={resultados.gratificacion} format={fmt} />
           {resultados.bonosImponibles > 0 && (
-            <ResultRow label="Bonos Imponibles" value={resultados.bonosImponibles} />
+            <ResultRow label="Bonos Imponibles" value={resultados.bonosImponibles} format={fmt} />
           )}
           {resultados.movilizacion > 0 && (
-            <ResultRow label="Movilización" value={resultados.movilizacion} />
+            <ResultRow label="Movilización" value={resultados.movilizacion} format={fmt} />
           )}
           {resultados.bonosNoImponibles > 0 && (
-            <ResultRow label="Bonos No Imponibles" value={resultados.bonosNoImponibles} />
+            <ResultRow label="Bonos No Imponibles" value={resultados.bonosNoImponibles} format={fmt} />
           )}
         </AccordionSection>
 
@@ -127,12 +130,13 @@ export function Resultados({
           variant="descuento"
           isOpen={isOpen("descuentos")}
           onToggle={() => toggle("descuentos")}
+          format={fmt}
         >
-          <ResultRow label="Cotización Previsional (AFP)" value={resultados.cotizacionPrevisional} />
-          <ResultRow label="Cotización Salud" value={resultados.cotizacionSalud} />
-          <ResultRow label="Seguro Cesantía" value={resultados.cesantia} />
+          <ResultRow label="Cotización Previsional (AFP)" value={resultados.cotizacionPrevisional} format={fmt} />
+          <ResultRow label="Cotización Salud" value={resultados.cotizacionSalud} format={fmt} />
+          <ResultRow label="Seguro Cesantía" value={resultados.cesantia} format={fmt} />
           {resultados.impuesto > 0 && (
-            <ResultRow label="Impuesto Único" value={resultados.impuesto} />
+            <ResultRow label="Impuesto Único" value={resultados.impuesto} format={fmt} />
           )}
         </AccordionSection>
 
@@ -146,18 +150,19 @@ export function Resultados({
           variant="total-header"
           isOpen={isOpen("mensual")}
           onToggle={() => toggle("mensual")}
+          format={fmt}
         >
-          <ResultRow label="Seguro Cesantía Empleador" value={resultados.cesantiaEmpleador} />
-          <ResultRow label="Mutual" value={resultados.mutual} />
-          <ResultRow label="SIS" value={resultados.sis} />
-          <ResultRow label="Cotización Expectativa Vida" value={resultados.expectativaVida} />
+          <ResultRow label="Seguro Cesantía Empleador" value={resultados.cesantiaEmpleador} format={fmt} />
+          <ResultRow label="Mutual" value={resultados.mutual} format={fmt} />
+          <ResultRow label="SIS" value={resultados.sis} format={fmt} />
+          <ResultRow label="Cotización Expectativa Vida" value={resultados.expectativaVida} format={fmt} />
           {resultados.afpEmpleador > 0 && (
-            <ResultRow label="Aporte AFP Empleador" value={resultados.afpEmpleador} />
+            <ResultRow label="Aporte AFP Empleador" value={resultados.afpEmpleador} format={fmt} />
           )}
           {resultados.seguroComplementario > 0 && (
-            <ResultRow label="Seguro Complementario Salud" value={resultados.seguroComplementario} />
+            <ResultRow label="Seguro Complementario Salud" value={resultados.seguroComplementario} format={fmt} />
           )}
-          <ResultRow label="Total Costos Patronales" value={resultados.totalPatronal} variant="total" />
+          <ResultRow label="Total Costos Patronales" value={resultados.totalPatronal} variant="total" format={fmt} />
         </AccordionSection>
 
         {/* Costo empresa anual */}
@@ -168,31 +173,21 @@ export function Resultados({
           variant="anual"
           isOpen={isOpen("anual")}
           onToggle={() => toggle("anual")}
+          format={fmt}
         >
           <ResultRow
             label="Costo mensual × 12"
             value={resultados.costoTotalEmpresa * 12}
+            format={fmt}
           />
           <div className="mt-2 mb-1">
             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
               Bonos Anuales
             </span>
           </div>
-          <BonoAnualRow
-            label="Bono Navidad"
-            uf={7}
-            bono={bonoNavidad}
-          />
-          <BonoAnualRow
-            label="Bono Fiestas Patrias"
-            uf={6}
-            bono={bonoFiestasPatrias}
-          />
-          <BonoAnualRow
-            label="Bono Escolaridad"
-            uf={3}
-            bono={bonoEscolaridad}
-          />
+          <BonoAnualRow label="Bono Navidad" uf={7} bono={bonoNavidad} format={fmt} />
+          <BonoAnualRow label="Bono Fiestas Patrias" uf={6} bono={bonoFiestasPatrias} format={fmt} />
+          <BonoAnualRow label="Bono Escolaridad" uf={3} bono={bonoEscolaridad} format={fmt} />
         </AccordionSection>
 
       </CardContent>
@@ -207,6 +202,7 @@ function AccordionSection({
   variant,
   isOpen,
   onToggle,
+  format,
   children,
 }: {
   icon: React.ReactNode
@@ -215,6 +211,7 @@ function AccordionSection({
   variant: "total" | "total-header" | "descuento" | "anual"
   isOpen: boolean
   onToggle: () => void
+  format: Formatter
   children: React.ReactNode
 }) {
   const valueClasses = {
@@ -242,7 +239,7 @@ function AccordionSection({
           <span className="text-sm font-semibold text-foreground">{label}</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className={`text-sm ${valueClasses[variant]}`}>{formatCLP(value)}</span>
+          <span className={`text-sm ${valueClasses[variant]}`}>{format(value)}</span>
           <ChevronDown
             className={`h-3.5 w-3.5 text-muted-foreground transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
           />
@@ -264,10 +261,12 @@ function BonoAnualRow({
   label,
   uf,
   bono,
+  format,
 }: {
   label: string
   uf: number
   bono: { montoImponible: number; costoEmpresa: number }
+  format: Formatter
 }) {
   return (
     <div className="py-0.5">
@@ -275,12 +274,12 @@ function BonoAnualRow({
         <span className="text-xs text-muted-foreground">
           {label} <span className="text-violet-500 font-medium">({uf} UF)</span>
         </span>
-        <span className="text-xs text-muted-foreground">{formatCLP(bono.montoImponible)}</span>
+        <span className="text-xs text-muted-foreground">{format(bono.montoImponible)}</span>
       </div>
       <div className="flex items-center justify-between">
         <span className="text-xs text-muted-foreground pl-3">→ Costo empresa</span>
         <span className="text-xs font-medium text-violet-600 dark:text-violet-400">
-          {formatCLP(bono.costoEmpresa)}
+          {format(bono.costoEmpresa)}
         </span>
       </div>
     </div>
@@ -291,12 +290,12 @@ function ResultRow({
   label,
   value,
   variant = "normal",
-  format = formatCLP,
+  format,
 }: {
   label: string
   value: number
   variant?: "normal" | "entrada" | "principal" | "total" | "total-header" | "descuento"
-  format?: (v: number) => string
+  format: Formatter
 }) {
   const valueClasses = {
     normal: "text-foreground",
