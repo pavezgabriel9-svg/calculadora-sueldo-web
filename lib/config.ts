@@ -93,9 +93,11 @@ export const BONOS_ANUALES_UF_DEFAULT = {
 }
 
 export const BONOS_EMPRESA_DEFAULT: BonoEmpresaTipo[] = [
-  { id: 'empresa',      nombre: 'Empresa',        montoFijo: 600000 },
-  { id: 'partnership',  nombre: 'Partnership',     tasa: 0.012 },
-  { id: 'jefe_area',    nombre: 'Jefe de Área',    tasa: 0.01 },
-  { id: 'jefe_unidad',  nombre: 'Jefe de Unidad',  tasa: 0.005 },
-  { id: 'subgerente',   nombre: 'Subgerente',       tasa: 0.015 },
+  { id: 'empresa',              nombre: 'Empresa',                       montoFijo: 600000 },
+  { id: 'partnership',          nombre: 'Partnership / Jefe de Unidad',  tasa: [0.4, 0.6, 1.0, 1.2] },
+  { id: 'vendedor',             nombre: 'Vendedor',                      tasa: [0.8, 1.1, 1.4, 1.7, 2.0] },
+  { id: 'jefe_area',            nombre: 'Jefe de Área',                  tasa: [0.4, 0.7, 1.2, 1.4] },
+  { id: 'subgerente',           nombre: 'Subgerente',                    tasa: [0.5, 1.0, 1.4, 1.8] },
+  { id: 'gerente',              nombre: 'Gerente',                       tasa: [0.5, 1.0, 1.5, 2.0] },
+  { id: 'gerente_general',      nombre: 'Gerente General',               tasa: [0.5, 1.0, 2.0, 3.0] },
 ]
